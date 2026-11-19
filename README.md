@@ -33,7 +33,7 @@ Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và ch�
 | TV3 · Nguyễn Đức Hưng | [M3](source/models/m3.py) | Smoothing Linear Regression |
 | TV4 · Trần Thiên Phúc | [M4](source/models/m4.py) | Huber Regression |
 
-TV4 phụ trách EDA tuần 1 và bàn giao kết quả cho cả nhóm để chốt bộ biến đầu vào. [Kế hoạch tuần 1](KE-HOACH-3-TUAN.md#tuần-1--eda-chốt-đầu-vào-và-làm-bốn-mô-hình)
+TV4 phụ trách EDA từ 19/11 và bàn giao kết quả để cả nhóm chốt bộ biến đầu vào ngày 20/11.
 
 Mỗi người báo lựa chọn cho nhóm để bốn thuật toán khác nhau. Import estimator đã chọn, khởi tạo rồi gán vào `ESTIMATOR` trong tệp của mình. Notebook hiện hệ số nếu estimator đã huấn luyện cung cấp `coef_` và `intercept_`. Khi `ESTIMATOR = None`, tệp chạy cấu hình mẫu để thử pipeline và notebook hiển thị trạng thái **Chưa chọn (mẫu)**. [Tài liệu hồi quy tuyến tính của scikit-learn](https://scikit-learn.org/stable/modules/linear_model.html)
 
@@ -43,7 +43,7 @@ Bộ biến mẫu gồm chiều dài cánh bơi, chiều dài và độ sâu m�
 .\.venv\Scripts\python.exe -m source.models.m2
 ```
 
-Khởi động lại kernel và chạy toàn bộ notebook để nạp lựa chọn mới. Mục 4 có bảng so sánh và danh sách chọn mô hình để xem hệ số, phần dư. [Kế hoạch 3 tuần](KE-HOACH-3-TUAN.md)
+Khởi động lại kernel và chạy toàn bộ notebook để nạp lựa chọn mới. Mục 4 có bảng so sánh và danh sách chọn mô hình để xem hệ số, phần dư. [Kế hoạch 19/11–08/12/2026](KE-HOACH-3-TUAN.md)
 
 Nếu dùng Git, mỗi người làm trên nhánh riêng và đưa tệp mô hình mình phụ trách vào commit. Ví dụ, người làm M2 có thể dùng `git add source/models/m2.py`. Phối hợp trước khi sửa notebook hoặc [pipeline chung](source/modeling.py). Khi gửi thay đổi cho một mô hình, giữ output notebook ở máy cá nhân để tránh xung đột.
 
