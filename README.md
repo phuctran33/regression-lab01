@@ -28,10 +28,10 @@ Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và ch�
 
 | Thành viên | Tệp phụ trách | Thuật toán |
 | --- | --- | --- |
-| 1 | [M1](source/models/m1.py) | [Thành viên tự chọn] |
-| 2 | [M2](source/models/m2.py) | [Thành viên tự chọn] |
-| 3 | [M3](source/models/m3.py) | [Thành viên tự chọn] |
-| 4 | [M4](source/models/m4.py) | [Thành viên tự chọn] |
+| TV1 · Tiết Trọng Khiêm | [M1](source/models/m1.py) | Ridge Regression |
+| TV2 · Nguyễn Khang Hy | [M2](source/models/m2.py) | Chưa chọn |
+| TV3 · Nguyễn Đức Hưng | [M3](source/models/m3.py) | Smoothing Linear Regression |
+| TV4 · Trần Thiên Phúc | [M4](source/models/m4.py) | Huber Regression |
 
 Mỗi người báo lựa chọn cho nhóm để bốn thuật toán khác nhau. Import estimator đã chọn, khởi tạo rồi gán vào `ESTIMATOR` trong tệp của mình. Notebook hiện hệ số nếu estimator đã huấn luyện cung cấp `coef_` và `intercept_`. Khi `ESTIMATOR = None`, tệp chạy cấu hình mẫu để thử pipeline và notebook hiển thị trạng thái **Chưa chọn (mẫu)**. [Tài liệu hồi quy tuyến tính của scikit-learn](https://scikit-learn.org/stable/modules/linear_model.html)
 
