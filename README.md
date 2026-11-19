@@ -1,6 +1,6 @@
 # Lab 01 – Dự đoán khối lượng chim cánh cụt
 
-Template hồi quy tuyến tính với bộ dữ liệu Palmer Penguins cho nhóm 4 người. Biến đích là `body_mass_g` (g). Notebook có 4 cấu hình mẫu, bắt đầu từ chiều dài cánh bơi và lần lượt bổ sung số đo mỏ, loài và giới tính. Nhóm điền các mục TODO và viết nhận xét dựa trên kết quả thực nghiệm.
+Template hồi quy tuyến tính với bộ dữ liệu Palmer Penguins cho nhóm 4 người. Biến đích là `body_mass_g` (g). Mỗi người tự chọn một thuật toán hồi quy tuyến tính và triển khai trong tệp mình phụ trách. Notebook dùng chung bộ đầu vào và tập kiểm tra để so sánh.
 
 | Tệp | Nội dung |
 | --- | --- |
@@ -26,21 +26,29 @@ Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và ch�
 
 ## Phân công mô hình
 
-| Thành viên | Tệp phụ trách | Biến đầu vào ban đầu |
+| Thành viên | Tệp phụ trách | Thuật toán |
 | --- | --- | --- |
-| 1 | [M1](source/models/m1.py) | Chiều dài cánh bơi |
-| 2 | [M2](source/models/m2.py) | Chiều dài cánh bơi, chiều dài và độ sâu mỏ |
-| 3 | [M3](source/models/m3.py) | Số đo của M2 và loài |
-| 4 | [M4](source/models/m4.py) | Đầu vào của M3 và giới tính |
+| 1 | [M1](source/models/m1.py) | [Thành viên tự chọn] |
+| 2 | [M2](source/models/m2.py) | [Thành viên tự chọn] |
+| 3 | [M3](source/models/m3.py) | [Thành viên tự chọn] |
+| 4 | [M4](source/models/m4.py) | [Thành viên tự chọn] |
 
-Mỗi người chỉnh `FEATURES` hoặc `build_model()` trong tệp của mình. Khởi động lại kernel và chạy toàn bộ notebook để nạp lần sửa mới. Mục 4 có bảng so sánh chung và danh sách chọn mô hình để xem hệ số, phần dư.
+Mỗi người báo lựa chọn cho nhóm để bốn thuật toán khác nhau. Import estimator đã chọn, khởi tạo rồi gán vào `ESTIMATOR` trong tệp của mình. Notebook hiện hệ số nếu estimator đã huấn luyện cung cấp `coef_` và `intercept_`. Khi `ESTIMATOR = None`, tệp chạy cấu hình mẫu để thử pipeline và notebook hiển thị trạng thái **Chưa chọn (mẫu)**. [Tài liệu hồi quy tuyến tính của scikit-learn](https://scikit-learn.org/stable/modules/linear_model.html)
+
+Bộ biến mẫu gồm chiều dài cánh bơi, chiều dài và độ sâu mỏ, loài và giới tính. Chạy mục 2 của notebook để bắt đầu khám phá dữ liệu train rồi chốt bộ biến chung trong `FEATURES`. Sau đó, mở terminal tại thư mục dự án và dùng lệnh dưới đây để chạy riêng M2. Đổi `m2` thành tệp mình phụ trách.
+
+```powershell
+.\.venv\Scripts\python.exe -m source.models.m2
+```
+
+Khởi động lại kernel và chạy toàn bộ notebook để nạp lựa chọn mới. Mục 4 có bảng so sánh và danh sách chọn mô hình để xem hệ số, phần dư. [Kế hoạch 3 tuần](KE-HOACH-3-TUAN.md)
 
 Nếu dùng Git, mỗi người làm trên nhánh riêng và đưa tệp mô hình mình phụ trách vào commit. Ví dụ, người làm M2 có thể dùng `git add source/models/m2.py`. Phối hợp trước khi sửa notebook hoặc [pipeline chung](source/modeling.py). Khi gửi thay đổi cho một mô hình, giữ output notebook ở máy cá nhân để tránh xung đột.
 
 ## Hoàn thiện bài nhóm
 
 1. Điền mục tiêu, động cơ, mã nhóm, thành viên và phân công.
-2. Giữ ít nhất 4 mô hình hồi quy tuyến tính. Giải thích cách tiền xử lý và lý do chọn biến cho từng mô hình.
+2. Chốt bộ biến và cách tiền xử lý dựa trên EDA. Giải thích lý do chọn thuật toán và siêu tham số của từng mô hình.
 3. Chạy lại toàn bộ notebook, đưa bảng chỉ số và biểu đồ vào báo cáo. Liên hệ nhận xét với hệ số, sai số và dữ liệu quan sát được.
 4. Quay video demo giao diện nhập dữ liệu, dự đoán và xem biểu đồ. Xuất báo cáo hoàn chỉnh sang PDF (đề gợi ý 10–20 trang).
 5. Cử một đại diện nộp `Group [Group-ID].zip`, thay `[Group-ID]` bằng mã nhóm. Gói nộp gồm thư mục `data/`, thư mục `source/`, `requirements.txt`, video demo và báo cáo PDF. Kiểm tra notebook chạy được sau khi giải nén.
