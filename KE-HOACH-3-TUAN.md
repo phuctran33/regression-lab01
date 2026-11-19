@@ -8,7 +8,7 @@
 | --- | --- | --- | --- | --- |
 | TV1 · Tiết Trọng Khiêm | [M1](source/models/m1.py) | Ridge Regression | Viết mô tả bài toán, nguồn dữ liệu, cách chia tập và gom gói nộp | TV2 |
 | TV2 · Nguyễn Khang Hy | [M2](source/models/m2.py) | Chưa chọn | Tổng hợp MAE, RMSE, R² và biểu đồ phần dư để so sánh bốn mô hình | TV1 |
-| TV3 · Nguyễn Đức Hưng | [M3](source/models/m3.py) | Smoothing Linear Regression | Viết phần EDA từ kết quả mình làm ở tuần 1, ghép báo cáo và xuất PDF. [Mẫu báo cáo](report/report-template.md) | TV4 |
+| TV3 · Nguyễn Đức Hưng | [M3](source/models/m3.py) | Smoothing Linear Regression | Tổng hợp kết quả EDA do TV4 bàn giao, ghép báo cáo và xuất PDF. [Mẫu báo cáo](report/report-template.md) | TV4 |
 | TV4 · Trần Thiên Phúc | [M4](source/models/m4.py) | Huber Regression | Tích hợp notebook và ứng dụng ở tuần 2, quay video ở tuần 3. [Notebook chung](source/lab01.ipynb) | TV3 |
 
 Bốn người tự chọn bốn thuật toán hồi quy tuyến tính khác nhau để dự đoán `body_mass_g`. Mỗi tệp có vị trí `ESTIMATOR` dành cho lựa chọn của người phụ trách. Cả nhóm chốt bộ biến đầu vào chung sau khi khám phá dữ liệu và dùng cùng pipeline, tập kiểm tra để so sánh kết quả.
@@ -18,7 +18,7 @@ Bốn người tự chọn bốn thuật toán hồi quy tuyến tính khác nha
 ## Cách làm việc hằng tuần
 
 1. **Một người một tệp mô hình.** Chọn và tìm hiểu thuật toán song song với EDA. Sau khi nhóm chốt bộ biến, điền `ESTIMATOR` rồi chạy riêng tệp của mình. Để xem hệ số và phần dư ở mục 4, khởi động lại kernel và chạy notebook. [Hướng dẫn chạy](README.md#phân-công-mô-hình)
-2. **Giữ phần dùng chung có người ghép.** TV3 phụ trách EDA và gửi đề xuất bộ biến. TV4 ghép các thay đổi vào notebook hoặc pipeline chung. Mỗi người gửi đoạn viết và hình của mình cho TV3 để ghép vào một bản báo cáo. [Pipeline chung](source/modeling.py)
+2. **Giữ phần dùng chung có người ghép.** TV4 phụ trách EDA, gửi đề xuất bộ biến và ghép các thay đổi vào notebook hoặc pipeline chung. Mỗi người gửi đoạn viết và hình của mình cho TV3 để ghép vào một bản báo cáo. [Pipeline chung](source/modeling.py)
 3. **Mỗi mô hình đi qua một lượt rà soát.** Người rà soát đọc tên thuật toán và cấu hình, kiểm tra log chạy và xem nhận xét có dẫn số liệu hay hình tương ứng. Hai cặp TV1–TV2 và TV3–TV4 rà chéo trước khi ghép. Khi vướng, gửi tên tệp, thông báo lỗi và bước tái hiện để người liên quan xử lý.
 4. **Dùng cùng cách đánh giá.** Notebook chia train/test 80/20 với seed 42. Dùng dữ liệu train để khám phá mối quan hệ với biến đích và chọn đầu vào. Các bước điền thiếu, chuẩn hóa và mã hóa được fit trên tập huấn luyện. Nếu thử nhiều cấu hình, chọn bằng đánh giá chéo trên train. Cả bốn mô hình dùng cùng tập test ở lượt so sánh cuối.
 
@@ -45,11 +45,11 @@ Mở pull request với ba dòng gồm thay đổi chính, kết quả chạy th
 
 ## Tuần 1 · EDA, chốt đầu vào và làm bốn mô hình
 
-**Ngày 1–2 · TV3 phụ trách toàn bộ EDA.** Dùng `train_data` ở mục 2 của notebook để kiểm tra giá trị thiếu và phân bố khối lượng. Xem quan hệ giữa khối lượng với các số đo cánh bơi, mỏ và so sánh theo loài, giới tính. Rà cột nào có sẵn lúc dự đoán. Cuối Ngày 2, TV3 gửi bảng hoặc hình chính cùng đề xuất biến giữ hoặc loại và lý do.
+**Ngày 1–2 · TV4 phụ trách toàn bộ EDA.** Dùng `train_data` ở mục 2 của notebook để kiểm tra giá trị thiếu và phân bố khối lượng. Xem quan hệ giữa khối lượng với các số đo cánh bơi, mỏ và so sánh theo loài, giới tính. Rà cột nào có sẵn lúc dự đoán. Cuối Ngày 2, TV4 gửi bảng hoặc hình chính cùng đề xuất biến giữ hoặc loại và lý do.
 
-**Chuẩn bị thuật toán song song.** TV1, TV2 và TV4 kiểm tra môi trường và tìm hiểu thuật toán cho M1, M2 và M4. TV3 chọn thuật toán cho M3 trong cùng giai đoạn. Cả bốn báo lựa chọn trong nhóm để tránh trùng.
+**Chuẩn bị thuật toán song song.** TV1, TV2 và TV3 kiểm tra môi trường và tìm hiểu thuật toán cho M1, M2 và M3. TV4 chuẩn bị M4 trong cùng giai đoạn. Cả bốn báo lựa chọn trong nhóm để tránh trùng.
 
-**Ngày 3 · Chốt bộ biến chung.** TV3 trình bày đề xuất dựa trên EDA. Cả nhóm thống nhất bộ biến và lưu lý do chọn vào ghi chú. Năm biến trong template là điểm xuất phát. TV4 cập nhật `FEATURES` để cả bốn người lấy cùng cấu hình. [Cấu hình đầu vào](source/modeling.py)
+**Ngày 3 · Chốt bộ biến chung.** TV4 trình bày đề xuất dựa trên EDA. Cả nhóm thống nhất bộ biến và lưu lý do chọn vào ghi chú. Năm biến trong template là điểm xuất phát. TV4 cập nhật `FEATURES` để cả bốn người lấy cùng cấu hình. [Cấu hình đầu vào](source/modeling.py)
 
 **Ngày 4–7 · Triển khai song song.** Mỗi người lấy bộ biến chung, điền `ESTIMATOR` trong tệp đã nhận và chạy thử từ terminal với cấu hình ban đầu. Ghi tên thuật toán, lý do chọn và các tham số có thể tinh chỉnh trong tuần 2.
 
@@ -65,7 +65,7 @@ Mở pull request với ba dòng gồm thay đổi chính, kết quả chạy th
 | --- | --- |
 | TV1 | Rà M2, gửi cấu hình chốt của M1 và ghi lại nguồn dữ liệu, cách chia tập để tuần 3 đưa vào báo cáo. |
 | TV2 | Rà M1, gửi cấu hình chốt của M2. Từ phiên bản đã ghép, lấy bảng MAE, RMSE, R² và biểu đồ phần dư. |
-| TV3 | Rà M4, gửi cấu hình chốt của M3. Gom bảng EDA và ghi chú chọn biến, chọn cấu hình của bốn người. |
+| TV3 | Rà M4, gửi cấu hình chốt của M3. Nhận bảng EDA và ghi chú chọn biến từ TV4, rồi tập hợp ghi chú chọn cấu hình của bốn người. |
 | TV4 | Rà M3, chốt M4 và ghép bốn cấu hình vào notebook. Chạy **Restart Kernel and Run All Cells**, chuyển kết quả cho TV2 và thử chọn mô hình, đổi đầu vào, dự đoán, xem biểu đồ. |
 
 **Ngày 12.** Rà chéo xong và chốt cấu hình của bốn mô hình. **Ngày 13.** Ghép code, chạy trên cùng tập test rồi kiểm thử giao diện với các mô hình đã chốt. **Bàn giao Ngày 14.** Có bảng test, bảng hệ số của bốn mô hình và ứng dụng chạy được từ nhập liệu đến dự đoán và biểu đồ. Ghi mã commit hoặc ngày chạy cạnh bảng để tuần 3 dùng cùng phiên bản.

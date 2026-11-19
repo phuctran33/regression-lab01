@@ -33,6 +33,8 @@ Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và ch�
 | TV3 · Nguyễn Đức Hưng | [M3](source/models/m3.py) | Smoothing Linear Regression |
 | TV4 · Trần Thiên Phúc | [M4](source/models/m4.py) | Huber Regression |
 
+TV4 phụ trách EDA tuần 1 và bàn giao kết quả cho cả nhóm để chốt bộ biến đầu vào. [Kế hoạch tuần 1](KE-HOACH-3-TUAN.md#tuần-1--eda-chốt-đầu-vào-và-làm-bốn-mô-hình)
+
 Mỗi người báo lựa chọn cho nhóm để bốn thuật toán khác nhau. Import estimator đã chọn, khởi tạo rồi gán vào `ESTIMATOR` trong tệp của mình. Notebook hiện hệ số nếu estimator đã huấn luyện cung cấp `coef_` và `intercept_`. Khi `ESTIMATOR = None`, tệp chạy cấu hình mẫu để thử pipeline và notebook hiển thị trạng thái **Chưa chọn (mẫu)**. [Tài liệu hồi quy tuyến tính của scikit-learn](https://scikit-learn.org/stable/modules/linear_model.html)
 
 Bộ biến mẫu gồm chiều dài cánh bơi, chiều dài và độ sâu mỏ, loài và giới tính. Chạy mục 2 của notebook để bắt đầu khám phá dữ liệu train rồi chốt bộ biến chung trong `FEATURES`. Sau đó, mở terminal tại thư mục dự án và dùng lệnh dưới đây để chạy riêng M2. Đổi `m2` thành tệp mình phụ trách.
