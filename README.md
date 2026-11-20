@@ -22,7 +22,7 @@ $labPython = "python"
 .\.venv\Scripts\python.exe -m jupyterlab source/lab01.ipynb
 ```
 
-Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và chạy **Kernel → Restart Kernel and Run All Cells**. Trong VS Code, mở notebook và chọn `.venv\Scripts\python.exe` làm kernel. Giao diện dự đoán nằm ở mục 5 của notebook.
+Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và chạy **Kernel → Restart Kernel and Run All Cells**. Trong VS Code, mở notebook và chọn `.venv\Scripts\python.exe` làm kernel. Giao diện ở mục 5 cho phép dự đoán bằng OLS hoặc M3, chỉnh đầu vào, xem xu hướng có điều kiện và so sánh hai đường. [Kịch bản demo Section 3.4](report/section-3-4-application.md)
 
 ## Phân công mô hình
 
@@ -35,7 +35,7 @@ Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và ch�
 
 TV4 phụ trách EDA từ 19/11 và bàn giao kết quả để cả nhóm chốt bộ biến đầu vào ngày 20/11.
 
-Mỗi người báo lựa chọn cho nhóm để bốn thuật toán khác nhau. Import estimator đã chọn, khởi tạo rồi gán vào `ESTIMATOR` trong tệp của mình. Notebook hiện hệ số nếu estimator đã huấn luyện cung cấp `coef_` và `intercept_`. Khi `ESTIMATOR = None`, tệp chạy cấu hình mẫu để thử pipeline và notebook hiển thị trạng thái **Chưa chọn (mẫu)**. [Tài liệu hồi quy tuyến tính của scikit-learn](https://scikit-learn.org/stable/modules/linear_model.html)
+Mỗi người báo lựa chọn cho nhóm để bốn thuật toán khác nhau. Import estimator đã chọn, khởi tạo rồi gán vào `ESTIMATOR` trong tệp của mình. Notebook hiện hệ số nếu estimator đã huấn luyện cung cấp `coef_` và `intercept_`. Khi `ESTIMATOR = None`, lệnh chạy riêng tệp vẫn dùng cấu hình mẫu để thử pipeline. Notebook hiển thị **Chưa sẵn sàng** và chỉ đưa các mô hình đã khai báo vào bảng đánh giá và giao diện dự đoán. [Tài liệu hồi quy tuyến tính của scikit-learn](https://scikit-learn.org/stable/modules/linear_model.html)
 
 Bộ biến mẫu gồm chiều dài cánh bơi, chiều dài và độ sâu mỏ, loài và giới tính. Chạy mục 2 của notebook để bắt đầu khám phá dữ liệu train rồi chốt bộ biến chung trong `FEATURES`. Sau đó, mở terminal tại thư mục dự án và dùng lệnh dưới đây để chạy riêng M2. Đổi `m2` thành tệp mình phụ trách.
 
@@ -43,7 +43,7 @@ Bộ biến mẫu gồm chiều dài cánh bơi, chiều dài và độ sâu m�
 .\.venv\Scripts\python.exe -m source.models.m2
 ```
 
-Khởi động lại kernel và chạy toàn bộ notebook để nạp lựa chọn mới. Mục 4 có bảng so sánh và danh sách chọn mô hình để xem hệ số, phần dư. [Kế hoạch 19/11–08/12/2026](KE-HOACH-3-TUAN.md)
+Khởi động lại kernel và chạy toàn bộ notebook để nạp lựa chọn mới. Mục 4 có bảng so sánh và danh sách chọn mô hình để xem hệ số, phần dư. Chạy `python -m source.evaluation` để tái lập bảng chẩn đoán OLS, đánh giá M3 và bootstrap theo cặp. [Phân tích Section 3.3](report/section-3-3-evaluation.md) · [Kế hoạch 19/11–08/12/2026](KE-HOACH-3-TUAN.md)
 
 Nếu dùng Git, mỗi người làm trên nhánh riêng và đưa tệp mô hình mình phụ trách vào commit. Ví dụ, người làm M2 có thể dùng `git add source/models/m2.py`. Phối hợp trước khi sửa notebook hoặc [pipeline chung](source/modeling.py). Khi gửi thay đổi cho một mô hình, giữ output notebook ở máy cá nhân để tránh xung đột.
 
