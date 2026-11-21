@@ -1,7 +1,9 @@
+from sklearn.linear_model import Ridge
+
 from ..modeling import make_pipeline, run_model
 
 NAME = "M1"
-ESTIMATOR = None  # TODO: Gán một estimator hồi quy tuyến tính do bạn chọn.
+ESTIMATOR = Ridge(alpha=1.0)
 
 
 def build_model():
