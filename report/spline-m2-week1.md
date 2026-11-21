@@ -100,17 +100,17 @@ Cấu hình `n_knots=3` có MAE và RMSE trung bình thấp nhất, đồng th�
 
 ### 3.4. Kiểm tra đặc trưng sau biến đổi
 
-Sau khi fit pipeline trên tập training, dữ liệu có kích thước `(273, 21)`.
+Sau khi fit pipeline trên tập training, dữ liệu có kích thước `(273, 15)`.
 
-Tổng số 21 đặc trưng gồm:
+Tổng số 15 đặc trưng gồm:
 
-- 6 spline basis features từ `flipper_length_mm`.
-- 6 spline basis features từ `bill_length_mm`.
-- 6 spline basis features từ `bill_depth_mm`.
+- 4 spline basis features từ `flipper_length_mm`.
+- 4 spline basis features từ `bill_length_mm`.
+- 4 spline basis features từ `bill_depth_mm`.
 - 2 biến giả của `species`.
 - 1 biến giả của `sex`.
 
-Kết quả này xác nhận ba biến số đã được biến đổi bằng spline và các biến phân loại vẫn được mã hóa One-Hot.
+Kết quả này xác nhận ba biến số đã được biến đổi bằng spline bậc ba và các biến phân loại vẫn được mã hóa One-Hot.
 
 ## 4. Đánh giá mô hình
 
