@@ -1,11 +1,33 @@
+from sklearn.base import clone
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import SplineTransformer
+
 from ..modeling import make_pipeline, run_model
 
 NAME = "M2"
-ESTIMATOR = None  # TODO: Gán một estimator hồi quy tuyến tính do bạn chọn.
+
+# Estimator hồi quy cuối cùng
+ESTIMATOR = LinearRegression()
+
+# Cấu hình Spline Regression ban đầu
+SPLINE_TRANSFORMER = SplineTransformer(
+    degree=3,
+    n_knots=3,
+    knots="uniform",
+    include_bias=False,
+    extrapolation="constant",
+)
 
 
 def build_model():
-    return make_pipeline(ESTIMATOR)
+    model = make_pipeline(ESTIMATOR)
+
+    # Thay StandardScaler trong nhánh numeric bằng SplineTransformer
+    model.set_params(
+        preprocess__numeric__scaler=clone(SPLINE_TRANSFORMER)
+    )
+
+    return model
 
 
 if __name__ == "__main__":
