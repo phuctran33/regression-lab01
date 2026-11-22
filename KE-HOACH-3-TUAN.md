@@ -7,8 +7,8 @@ Nhóm bắt đầu **19/11/2026** và nộp bài **08/12/2026**. Chốt mô hìn
 | Thành viên | Tệp phụ trách | Thuật toán | Việc chung | Người rà soát |
 | --- | --- | --- | --- | --- |
 | TV1 · Tiết Trọng Khiêm | [M1](source/models/m1.py) | Ridge Regression | Viết mô tả bài toán, nguồn dữ liệu, cách chia tập và gom gói nộp | TV2 |
-| TV2 · Nguyễn Khang Hy | [M2](source/models/m2.py) | Chưa chọn | Tổng hợp MAE, RMSE, R² và biểu đồ phần dư để so sánh bốn mô hình | TV1 |
-| TV3 · Nguyễn Đức Hưng | [M3](source/models/m3.py) | Smoothing Linear Regression | Tổng hợp kết quả EDA do TV4 bàn giao, ghép báo cáo và xuất PDF. [Mẫu báo cáo](report/report-template.md) | TV4 |
+| TV2 · Nguyễn Khang Hy | [M2](source/models/m2.py) | Cubic Spline Basis Regression | Tổng hợp MAE, RMSE, R² và biểu đồ phần dư để so sánh bốn mô hình | TV1 |
+| TV3 · Nguyễn Đức Hưng | [M3](source/models/m3.py) | Additive Natural Cubic Smoothing Spline | Tổng hợp kết quả EDA do TV4 bàn giao, ghép báo cáo và xuất PDF. [Mẫu báo cáo](report/report-template.md) | TV4 |
 | TV4 · Trần Thiên Phúc | [M4](source/models/m4.py) | Huber Regression | Làm EDA, tích hợp notebook và ứng dụng, quay video. [Notebook chung](source/lab01.ipynb) | TV3 |
 
 Bốn người tự chọn bốn thuật toán hồi quy tuyến tính khác nhau để dự đoán `body_mass_g`. Mỗi tệp có vị trí `ESTIMATOR` dành cho lựa chọn của người phụ trách. Cả nhóm chốt bộ biến đầu vào chung sau khi khám phá dữ liệu và dùng cùng pipeline, tập kiểm tra để so sánh kết quả.

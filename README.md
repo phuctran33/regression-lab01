@@ -22,16 +22,16 @@ $labPython = "python"
 .\.venv\Scripts\python.exe -m jupyterlab source/lab01.ipynb
 ```
 
-Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và chạy **Kernel → Restart Kernel and Run All Cells**. Trong VS Code, mở notebook và chọn `.venv\Scripts\python.exe` làm kernel. Giao diện ở mục 5 cho phép dự đoán bằng OLS hoặc M3, chỉnh đầu vào, xem xu hướng có điều kiện và so sánh hai đường. [Kịch bản demo Section 3.4](report/section-3-4-application.md)
+Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và chạy **Kernel → Restart Kernel and Run All Cells**. Trong VS Code, mở notebook và chọn `.venv\Scripts\python.exe` làm kernel. Giao diện ở mục 5 cho phép dự đoán bằng các mô hình sẵn sàng, chỉnh đầu vào và xem xu hướng có điều kiện. Chế độ so sánh hiển thị hai đường OLS và M3. [Kịch bản demo Section 3.4](report/section-3-4-application.md)
 
 ## Phân công mô hình
 
 | Thành viên | Tệp phụ trách | Thuật toán |
 | --- | --- | --- |
 | TV1 · Tiết Trọng Khiêm | [M1](source/models/m1.py) | Ridge Regression |
-| TV2 · Nguyễn Khang Hy | [M2](source/models/m2.py) | Chưa chọn |
-| TV3 · Nguyễn Đức Hưng | [M3](source/models/m3.py) | Smoothing Linear Regression |
-| TV4 · Trần Thiên Phúc | [M4](source/models/m4.py) | Huber Regression |
+| TV2 · Nguyễn Khang Hy | [M2](source/models/m2.py) | Cubic Spline Basis Regression |
+| TV3 · Nguyễn Đức Hưng | [M3](source/models/m3.py) | Additive Natural Cubic Smoothing Spline |
+| TV4 · Trần Thiên Phúc | [M4](source/models/m4.py) | Huber Regression (dự kiến) |
 
 TV4 phụ trách EDA từ 19/11 và bàn giao kết quả để cả nhóm chốt bộ biến đầu vào ngày 20/11.
 
