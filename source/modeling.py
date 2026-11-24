@@ -24,9 +24,10 @@ def split_penguins(penguins):
     return train_test_split(labeled, test_size=0.20, random_state=42)
 
 
-def make_pipeline(estimator=None):
-    numeric_features = [feature for feature in FEATURES if feature not in CATEGORICAL]
-    categorical_features = [feature for feature in FEATURES if feature in CATEGORICAL]
+def make_pipeline(estimator=None, *, features=None):
+    features = FEATURES if features is None else features
+    numeric_features = [feature for feature in features if feature not in CATEGORICAL]
+    categorical_features = [feature for feature in features if feature in CATEGORICAL]
 
     numeric_pipeline = Pipeline([
         ("imputer", SimpleImputer(strategy="median")),
