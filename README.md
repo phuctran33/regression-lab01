@@ -22,7 +22,7 @@ $labPython = "python"
 .\.venv\Scripts\python.exe -m jupyterlab source/lab01.ipynb
 ```
 
-Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và chạy **Kernel → Restart Kernel and Run All Cells**. Trong VS Code, mở notebook và chọn `.venv\Scripts\python.exe` làm kernel. Giao diện ở mục 5 cho phép dự đoán bằng các mô hình sẵn sàng, chỉnh đầu vào và xem xu hướng có điều kiện. Chế độ so sánh hiển thị hai đường OLS và M3. [Kịch bản demo Section 3.4](report/section-3-4-application.md)
+Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và chạy **Kernel → Restart Kernel and Run All Cells**. Trong VS Code, mở notebook và chọn `.venv\Scripts\python.exe` làm kernel. Giao diện ở mục 5 cho phép dự đoán bằng các mô hình sẵn sàng, chỉnh đầu vào và xem xu hướng có điều kiện. Chế độ so sánh hiển thị các mô hình trên cùng đầu vào. Khi chọn OLS, kết quả có thêm CI cho trung bình và PI cho một cá thể. [Kịch bản demo Section 3.4](report/section-3-4-application.md)
 
 ## Phân công mô hình
 

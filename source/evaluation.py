@@ -29,27 +29,43 @@ SEED = 42
 FIGURES = Path(__file__).resolve().parents[1] / "report" / "figures"
 
 
-def fit_ols_inference(pipeline, train):
+def ols_design(pipeline, rows):
     """Use the fitted sklearn design and retain its column order and row labels."""
     preprocess = pipeline.named_steps["preprocess"]
     design = pd.DataFrame(
-        preprocess.transform(train[FEATURES]),
-        index=train.index,
+        preprocess.transform(rows[FEATURES]),
+        index=rows.index,
         columns=preprocess.get_feature_names_out(),
     )
-    design = sm.add_constant(design, has_constant="add")
-    result = sm.OLS(train[TARGET], design, missing="raise").fit()
+    return sm.add_constant(design, has_constant="add")
+
+
+def fit_ols_inference(pipeline, train):
+    result = sm.OLS(train[TARGET], ols_design(pipeline, train), missing="raise").fit()
     expected = pipeline.predict(train[FEATURES])
     np.testing.assert_allclose(result.fittedvalues, expected, rtol=0, atol=1e-8)
     return result, float(np.abs(result.fittedvalues - expected).max())
+
+
+def ols_prediction_intervals(pipeline, result, rows):
+    """Return the classical OLS 95% mean and individual intervals for raw inputs."""
+    return result.get_prediction(ols_design(pipeline, rows)).summary_frame(alpha=0.05)
 
 
 def ols_tables(result, train):
     design = result.model.exog
     terms = result.model.exog_names
     robust = result.get_robustcov_results(cov_type="HC3", use_t=True)
-    restrictions = np.eye(len(terms))[1:]
-    joint_hc3 = robust.f_test(restrictions)
+    coefficient_selectors = np.eye(len(terms))
+    joint_hc3 = robust.f_test(coefficient_selectors[1:])
+    species_restrictions = coefficient_selectors[[term.startswith("species_") for term in terms]]
+    species_tests = pd.DataFrame.from_dict({
+        label: (float(test.fvalue), int(test.df_num), int(test.df_denom), float(test.pvalue))
+        for label, test in (
+            ("Partial F (classical)", result.f_test(species_restrictions)),
+            ("Wald F (HC3)", robust.f_test(species_restrictions)),
+        )
+    }, orient="index", columns=["F", "df numerator", "df denominator", "p"])
     classical_ci = result.conf_int().to_numpy()
     robust_ci = robust.conf_int()
     coefficients = pd.DataFrame({
@@ -69,10 +85,12 @@ def ols_tables(result, train):
     bp, bp_p, _, _ = het_breuschpagan(result.resid, design, robust=True)
     reset = linear_reset(result, power=3, use_f=True, cov_type="HC3")
     tests = pd.DataFrame.from_dict({
-        "RESET F (HC3)": (float(reset.fvalue), float(reset.pvalue)),
-        "Jarque–Bera χ²": (jb, jb_p),
-        "Breusch–Pagan/Koenker LM χ²": (bp, bp_p),
-    }, orient="index", columns=["Statistic", "p"])
+        "RESET F (HC3)": (
+            float(reset.fvalue), f"{int(reset.df_num)}, {int(reset.df_denom)}", float(reset.pvalue),
+        ),
+        "Jarque–Bera χ²": (jb, "2", jb_p),
+        "Breusch–Pagan/Koenker LM χ²": (bp, str(int(result.df_model)), bp_p),
+    }, orient="index", columns=["Statistic", "df", "p"])
     vif = pd.Series(
         [variance_inflation_factor(design, j) for j in range(1, len(terms))],
         index=terms[1:], name="VIF",
@@ -87,6 +105,8 @@ def ols_tables(result, train):
     fit = pd.Series({
         "n": n, "R²": result.rsquared, "Adjusted R²": result.rsquared_adj,
         "df model": result.df_model, "df residual": result.df_resid,
+        "SSE (g²)": result.ssr, "Residual variance (g²)": result.mse_resid,
+        "Residual standard error (g)": np.sqrt(result.mse_resid),
         "F": result.fvalue, "p F": result.f_pvalue,
         "F HC3": float(joint_hc3.fvalue), "p F HC3": float(joint_hc3.pvalue),
         "Skewness": skew, "Kurtosis": kurtosis,
@@ -97,6 +117,7 @@ def ols_tables(result, train):
     return {
         "OLS train fit": fit,
         "OLS coefficients": coefficients,
+        "OLS joint species tests": species_tests,
         "OLS train diagnostics": tests,
         "Train numeric Pearson": train[NUMERIC].corr(),
         "Train VIF": vif,
@@ -134,6 +155,8 @@ def test_predictions(models, test):
 
 def heldout_tables(test, predictions):
     actual = test[TARGET]
+    if not predictions.index.equals(actual.index):
+        raise ValueError("Test predictions must have the same index and row order as test observations.")
     residuals = predictions.rsub(actual, axis=0)
     scores = pd.DataFrame.from_dict({
         name: {
@@ -202,21 +225,34 @@ def save_ols_diagnostics(result, train, path):
 
 
 def save_test_comparison(actual, predictions, path):
-    fig, axes = plt.subplots(1, 3, figsize=(12, 3.9), layout="constrained")
+    fig, axes = plt.subplot_mosaic(
+        [["OLS observed", "M3 observed", "residuals"], ["OLS fitted", "M3 fitted", "residuals"]],
+        figsize=(12, 7), layout="constrained",
+    )
     residuals = predictions.rsub(actual, axis=0)
     limits = (min(actual.min(), predictions.min().min()), max(actual.max(), predictions.max().max()))
+    residual_extent = residuals.abs().max().max() * 1.05
     bins = np.histogram_bin_edges(residuals.to_numpy().ravel(), bins=14)
-    for ax, (name, predicted) in zip(axes[:2], predictions.items(), strict=True):
+    for name, predicted in predictions.items():
+        ax = axes[f"{name} observed"]
         ax.scatter(actual, predicted, s=22, alpha=0.6, color=COLORS[name])
         ax.plot(limits, limits, ls="--", lw=1, color="#49566c")
         ax.set(xlabel="Thực tế (g)", ylabel="Dự đoán (g)", title=name, aspect="equal")
-        axes[2].hist(
+        residual_ax = axes[f"{name} fitted"]
+        residual_ax.scatter(predicted, residuals[name], s=22, alpha=0.6, color=COLORS[name])
+        residual_ax.axhline(0, color="#49566c", ls="--", lw=1)
+        residual_ax.set(
+            xlabel="Dự đoán (g)", ylabel="Phần dư (g)", xlim=limits,
+            ylim=(-residual_extent, residual_extent),
+        )
+        axes["residuals"].hist(
             residuals[name], bins=bins, histtype="step", linewidth=2, color=COLORS[name],
             linestyle="--" if name == "OLS" else "-", label=name,
         )
-    axes[2].axvline(0, color="#49566c", ls=":", lw=1)
-    axes[2].set(xlabel="Thực tế − dự đoán (g)", ylabel="Số mẫu", title="Phần dư")
-    axes[2].legend(frameon=False)
+    histogram = axes["residuals"]
+    histogram.axvline(0, color="#49566c", ls=":", lw=1)
+    histogram.set(xlabel="Thực tế − dự đoán (g)", ylabel="Số mẫu", title="Phân phối phần dư")
+    histogram.legend(frameon=False)
     fig.suptitle(f"Dự đoán trên test (n = {len(actual)})")
     fig.savefig(path, dpi=150)
     plt.close(fig)
@@ -241,14 +277,15 @@ def save_smooth_effects(models, train, path):
         grid = np.linspace(observed.min(), observed.max(), 250)
         raw = grid * scale.scale_[index] + scale.mean_[index]
         effect = spline(grid) - center
+        ols_effect = slopes[index] * grid
         departure = effect - np.polyval(affine, grid)
         curvature.append((
             feature, np.sqrt(np.mean((observed_effect - np.polyval(affine, observed)) ** 2)),
-            np.abs(departure).max(),
+            np.abs(departure).max(), np.abs(effect - ols_effect).max(),
         ))
         top, bottom = axes[:, column]
         top.plot(raw, effect, color=COLORS["M3"], lw=2, label="M3")
-        top.plot(raw, slopes[index] * grid, color=COLORS["OLS"], ls="--", lw=1.8, label="OLS")
+        top.plot(raw, ols_effect, color=COLORS["OLS"], ls="--", lw=1.8, label="OLS")
         top.set_title(LABELS.get(feature, feature))
         bottom.plot(raw, departure, color=COLORS["M3"], lw=2)
         bottom.axhline(0, color="#49566c", ls="--", lw=1)
@@ -263,6 +300,7 @@ def save_smooth_effects(models, train, path):
     plt.close(fig)
     return pd.DataFrame(curvature, columns=[
         "Feature", "RMS departure at training observations (g)", "Max departure on grid (g)",
+        "Max difference from OLS on grid (g)",
     ]).set_index("Feature")
 
 
@@ -273,11 +311,18 @@ def analyze(train, test, figure_dir):
     inference, gap = fit_ols_inference(models[ols.NAME], train)
     tables = ols_tables(inference, train)
     tables["OLS prediction parity, max gap (g)"] = gap
+    # Measurements of Adelie female at row index 130 in the shared training split.
+    example = pd.DataFrame([[190.0, 38.5, 17.9, "Adelie", "female"]], columns=FEATURES)
+    tables["OLS prediction example, input"] = example
+    tables["OLS prediction example, 95% intervals (g)"] = ols_prediction_intervals(
+        models[ols.NAME], inference, example,
+    )
     tables["Train CV, 5 folds"] = train_cv(train)
     spline = models[m3.NAME].named_steps["regression"]
     tables["M3 train configuration"] = pd.Series({
         "lambda": spline.lam, "sweeps": spline.n_iter_, "max sweeps": spline.max_iter,
-        "tolerance (g)": spline.tol,
+        "tolerance (g)": spline.tol, "last max change (g)": spline.max_change_,
+        "converged": spline.converged_,
     })
     figure_dir.mkdir(parents=True, exist_ok=True)
     save_ols_diagnostics(inference, train, figure_dir / "section-3-3-ols-diagnostics.png")

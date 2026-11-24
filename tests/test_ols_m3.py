@@ -44,7 +44,8 @@ class RegressionTests(unittest.TestCase):
                 if module is m3:
                     regression = model.named_steps["regression"]
                     self.assertIsNotNone(m3.ESTIMATOR)
-                    self.assertLess(regression.n_iter_, regression.max_iter)
+                    self.assertTrue(regression.converged_)
+                    self.assertLessEqual(regression.max_change_, regression.tol)
                     x_train = preprocessor.transform(train[FEATURES])
                     residual = train[TARGET].to_numpy() - regression.predict(x_train)
                     linear_design = x_train[:, regression.linear_indices_]
