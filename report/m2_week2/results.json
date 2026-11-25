@@ -1,0 +1,332 @@
+{
+  "setup": {
+    "n_train": 273,
+    "n_test": 69,
+    "seed": 42,
+    "n_boot": 2000
+  },
+  "A": {
+    "config": {
+      "degree": 3,
+      "n_knots": 3,
+      "knots": "uniform",
+      "include_bias": false,
+      "extrapolation": "constant"
+    },
+    "transformed_shape": [
+      273,
+      15
+    ],
+    "feature_names": [
+      "flipper_length_mm_sp_0",
+      "flipper_length_mm_sp_1",
+      "flipper_length_mm_sp_2",
+      "flipper_length_mm_sp_3",
+      "bill_length_mm_sp_0",
+      "bill_length_mm_sp_1",
+      "bill_length_mm_sp_2",
+      "bill_length_mm_sp_3",
+      "bill_depth_mm_sp_0",
+      "bill_depth_mm_sp_1",
+      "bill_depth_mm_sp_2",
+      "bill_depth_mm_sp_3",
+      "species_Chinstrap",
+      "species_Gentoo",
+      "sex_male"
+    ],
+    "test_out_of_train_range": {
+      "flipper_length_mm": 0,
+      "bill_length_mm": 0,
+      "bill_depth_mm": 0
+    },
+    "week1_reproduced": true,
+    "missing_in_train": {
+      "flipper_length_mm": 0,
+      "bill_length_mm": 0,
+      "bill_depth_mm": 0,
+      "species": 0,
+      "sex": 5
+    }
+  },
+  "B": {
+    "test": {
+      "M2 (Spline)": {
+        "MAE (g)": 252.93439465144115,
+        "MSE (g²)": 95009.74438211578,
+        "RMSE (g)": 308.2365072182654,
+        "R²": 0.831571922409067
+      },
+      "OLS": {
+        "MAE (g)": 256.6834882190074,
+        "MSE (g²)": 94252.10243695547,
+        "RMSE (g)": 307.0050527873368,
+        "R²": 0.832915028604705
+      }
+    },
+    "cv": {
+      "M2": {
+        "mean": {
+          "MAE (g)": 234.40403565223818,
+          "MSE (g²)": 88277.63759581972,
+          "RMSE (g)": 295.8742944753698,
+          "R²": 0.8586732873404508
+        },
+        "std (ddof=1)": {
+          "MAE (g)": 24.89227228144804,
+          "MSE (g²)": 17199.878965973054,
+          "RMSE (g)": 30.332314957027545,
+          "R²": 0.037172112634357046
+        }
+      },
+      "OLS": {
+        "mean": {
+          "MAE (g)": 225.585770600466,
+          "MSE (g²)": 84042.92793221623,
+          "RMSE (g)": 289.2876176372094,
+          "R²": 0.8662366602618821
+        },
+        "std (ddof=1)": {
+          "MAE (g)": 17.191700212608595,
+          "MSE (g²)": 11682.628874496244,
+          "RMSE (g)": 21.08323427524721,
+          "R²": 0.022781131037719372
+        }
+      }
+    },
+    "nested_mae_mean": 238.9499151041582,
+    "nested_mae_std": 28.294676989877285,
+    "nested_chosen": [
+      3,
+      3,
+      3,
+      3,
+      6
+    ],
+    "folds_m2_better_mae": 2,
+    "oof_overall": {
+      "MAE (g)": 234.3923013056876,
+      "MSE (g²)": 88267.65086826765,
+      "RMSE (g)": 297.0987224278618,
+      "R²": 0.8663755796145083
+    },
+    "shapiro_oof_resid": {
+      "W": 0.9939506694350976,
+      "p": 0.34536713985843026
+    },
+    "levene_oof_resid_by_species": {
+      "stat": 0.13371592917146527,
+      "p": 0.8748964426977656
+    }
+  },
+  "D": [
+    {
+      "chỉ số": "ΔMAE (g)  [chỉ số chính]",
+      "quan sát": -3.7490935675662627,
+      "trung bình bootstrap": -3.9323092522766747,
+      "CI95 thấp": -16.505815354559296,
+      "CI95 cao": 8.406415129688735,
+      "CI chứa 0": true,
+      "tỷ lệ Δ<0": 0.7345
+    },
+    {
+      "chỉ số": "ΔRMSE (g) [phụ, khám phá]",
+      "quan sát": 1.2314544309285793,
+      "trung bình bootstrap": 1.163945564065113,
+      "CI95 thấp": -10.85228801544613,
+      "CI95 cao": 13.232628175718245,
+      "CI chứa 0": true,
+      "tỷ lệ Δ<0": 0.4305
+    },
+    {
+      "chỉ số": "ΔR²       [phụ, khám phá]",
+      "quan sát": -0.0013431061956380441,
+      "trung bình bootstrap": -0.0013799036173310745,
+      "CI95 thấp": -0.015429739427892022,
+      "CI95 cao": 0.012387370033774063,
+      "CI chứa 0": true,
+      "tỷ lệ Δ<0": 0.5695
+    },
+    {
+      "mae_m2": 252.93439465144115,
+      "mae_ols": 256.6834882190074,
+      "n_m2_better": 35,
+      "n": 69
+    }
+  ],
+  "C": {
+    "reference": {
+      "flipper_length_mm": 197.0,
+      "bill_length_mm": 44.5,
+      "bill_depth_mm": 17.3,
+      "species": "Adelie",
+      "sex": "female"
+    },
+    "m3_loaded": false,
+    "band_coverage": [
+      {
+        "biến": "flipper_length_mm",
+        "tỷ lệ điểm p5–p95 mà đường OLS nằm trong dải CI95 của M2": 1.0,
+        "|M2 − OLS| lớn nhất trong p5–p95 (g)": 268.7882167651801,
+        "nửa bề rộng dải CI95 M2, trung bình (g)": 240.16778644440836
+      },
+      {
+        "biến": "bill_length_mm",
+        "tỷ lệ điểm p5–p95 mà đường OLS nằm trong dải CI95 của M2": 1.0,
+        "|M2 − OLS| lớn nhất trong p5–p95 (g)": 62.573265031402116,
+        "nửa bề rộng dải CI95 M2, trung bình (g)": 181.1339634692702
+      },
+      {
+        "biến": "bill_depth_mm",
+        "tỷ lệ điểm p5–p95 mà đường OLS nằm trong dải CI95 của M2": 1.0,
+        "|M2 − OLS| lớn nhất trong p5–p95 (g)": 105.19839448006041,
+        "nửa bề rộng dải CI95 M2, trung bình (g)": 229.91512919573333
+      }
+    ],
+    "curvature": [
+      {
+        "biến": "flipper_length_mm",
+        "mô hình": "M2",
+        "biên độ lệch khỏi đường thẳng (g)": 94.65144755856318,
+        "tại x (mm)": 181.14499999999998,
+        "độ dốc TB (g/mm)": 17.29234474993297,
+        "dốc đoạn thấp": 7.113867664076936,
+        "dốc đoạn giữa": 19.90259840683878,
+        "dốc đoạn cao": 20.564441524182353,
+        "khoảng p5–p95 (mm)": "181.0–225.0",
+        "tổng thay đổi theo đường thẳng p5→p95 (g)": 760.8631689970506
+      },
+      {
+        "biến": "flipper_length_mm",
+        "mô hình": "OLS",
+        "biên độ lệch khỏi đường thẳng (g)": 1.3642420526593924e-12,
+        "tại x (mm)": 181.14499999999998,
+        "độ dốc TB (g/mm)": 12.974447139591682,
+        "dốc đoạn thấp": 12.974447139591677,
+        "dốc đoạn giữa": 12.974447139591687,
+        "dốc đoạn cao": 12.97444713959166,
+        "khoảng p5–p95 (mm)": "181.0–225.0",
+        "tổng thay đổi theo đường thẳng p5→p95 (g)": 570.875674142034
+      },
+      {
+        "biến": "bill_length_mm",
+        "mô hình": "M2",
+        "biên độ lệch khỏi đường thẳng (g)": 82.02843944803453,
+        "tại x (mm)": 51.900000000000006,
+        "độ dốc TB (g/mm)": 17.767630464719876,
+        "dốc đoạn thấp": 29.125791900934676,
+        "dốc đoạn giữa": 23.33608728491664,
+        "dốc đoạn cao": -6.135132216513943,
+        "khoảng p5–p95 (mm)": "35.6–52.0",
+        "tổng thay đổi theo đường thẳng p5→p95 (g)": 292.0998448399947
+      },
+      {
+        "biến": "bill_length_mm",
+        "mô hình": "OLS",
+        "biên độ lệch khỏi đường thẳng (g)": 2.7284841053187847e-12,
+        "tại x (mm)": 35.95,
+        "độ dốc TB (g/mm)": 16.197913265319443,
+        "dốc đoạn thấp": 16.197913265319404,
+        "dốc đoạn giữa": 16.197913265319333,
+        "dốc đoạn cao": 16.197913265319563,
+        "khoảng p5–p95 (mm)": "35.6–52.0",
+        "tổng thay đổi theo đường thẳng p5→p95 (g)": 266.2936940818516
+      },
+      {
+        "biến": "bill_depth_mm",
+        "mô hình": "M2",
+        "biên độ lệch khỏi đường thẳng (g)": 65.60649996736447,
+        "tại x (mm)": 13.898,
+        "độ dốc TB (g/mm)": 93.49538811898637,
+        "dốc đoạn thấp": 139.30132165333063,
+        "dốc đoạn giữa": 94.28152056463469,
+        "dốc đoạn cao": 50.87208675359067,
+        "khoảng p5–p95 (mm)": "13.9–20.0",
+        "tổng thay đổi theo đường thẳng p5→p95 (g)": 574.0616830505762
+      },
+      {
+        "biến": "bill_depth_mm",
+        "mô hình": "OLS",
+        "biên độ lệch khỏi đường thẳng (g)": 1.8189894035458565e-12,
+        "tại x (mm)": 14.065999999999999,
+        "độ dốc TB (g/mm)": 75.6183896955591,
+        "dốc đoạn thấp": 75.61838969555907,
+        "dốc đoạn giữa": 75.6183896955591,
+        "dốc đoạn cao": 75.61838969555912,
+        "khoảng p5–p95 (mm)": "13.9–20.0",
+        "tổng thay đổi theo đường thẳng p5→p95 (g)": 464.2969127307328
+      }
+    ]
+  },
+  "E": {
+    "nest_err": 2.5579538487363607e-13,
+    "params_ols": 7,
+    "params_m2": 16,
+    "rss_ols": 21640248.364389434,
+    "rss_m2": 20558914.39755983,
+    "F": 1.5019320362351931,
+    "p_F": 0.147318502567356,
+    "F_HC3": 1.5957431205291226,
+    "p_HC3": 0.11662545081221326,
+    "partial": [
+      {
+        "biến": "flipper_length_mm",
+        "df_tử": 3,
+        "df_mẫu": 257,
+        "F": 1.1774386441387017,
+        "p": 0.3188131193244373,
+        "p_Holm": 0.6821915102926754
+      },
+      {
+        "biến": "bill_length_mm",
+        "df_tử": 3,
+        "df_mẫu": 257,
+        "F": 1.4547362541343485,
+        "p": 0.2273971700975585,
+        "p_Holm": 0.6821915102926754
+      },
+      {
+        "biến": "bill_depth_mm",
+        "df_tử": 3,
+        "df_mẫu": 257,
+        "F": 0.8996662291771592,
+        "p": 0.44190628965222334,
+        "p_Holm": 0.6821915102926754
+      }
+    ],
+    "null": [
+      {
+        "biến": "flipper_length_mm",
+        "biên độ quan sát (g)": 94.65144755856318,
+        "null median (g)": 57.0322991458263,
+        "null p95 (g)": 116.10394191853142,
+        "p bootstrap": 0.14485514485514486
+      },
+      {
+        "biến": "bill_length_mm",
+        "biên độ quan sát (g)": 82.02843944803453,
+        "null median (g)": 43.493023396339595,
+        "null p95 (g)": 95.80016517664916,
+        "p bootstrap": 0.1038961038961039
+      },
+      {
+        "biến": "bill_depth_mm",
+        "biên độ quan sát (g)": 65.60649996736447,
+        "null median (g)": 52.86729177966117,
+        "null p95 (g)": 103.91057270083033,
+        "p bootstrap": 0.34965034965034963
+      }
+    ],
+    "aic": {
+      "ols": 3093.602078404455,
+      "m2": 3097.6080182811124
+    },
+    "bic": {
+      "ols": 3118.8683809707495,
+      "m2": 3155.359567004072
+    },
+    "shapiro_train_resid_full": {
+      "W": 0.9932721534560285,
+      "p": 0.2590546507950585
+    }
+  }
+}
