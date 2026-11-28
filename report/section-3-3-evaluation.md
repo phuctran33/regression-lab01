@@ -185,7 +185,7 @@ Cả hai khoảng chứa 0, nên dữ liệu đánh giá chưa cho bằng chứn
 
 ### Bàn giao vào bảng so sánh chung
 
-M1 của Khiêm đã bàn giao kết quả tuần 1 trên cùng tập test, với MAE 254,103 g, RMSE 301,776 g và R² = 0,839. M2 của Hy đã bàn giao MAE 252,934 g, RMSE 308,237 g và R² = 0,832, cùng bảng CV cho bước chọn số nút. Kết quả chuẩn hóa tuần 2 của M1 và M2, kết quả M4 và phần diễn giải riêng của mỗi mô hình sẽ được ghép từ tác giả tương ứng. Bảng 3.3.9–3.3.12 trình bày phần OLS/M3 đã hoàn tất. [Bàn giao M1](../reports/ridge-m1-week1.md) · [Bàn giao M2](spline-m2-week1.md) · [Issue #10 · M4](https://github.com/phuctran33/regression-lab01/issues/10)
+Bản tích hợp dùng M1 tuần 2 (α=0,1), M2 (3 mốc) và M3 (λ=100) cùng OLS trên 69 cá thể. Các bảng OLS/M3 được mở rộng trong báo cáo chung với nested CV, hai mốc dự đoán hằng và khoảng dự đoán conformal. M4 còn chờ Phúc. [Báo cáo tích hợp](integration.md) · [M1](../reports/ridge-m1-week2.md) · [M2](m2_week2/M2_week2_report.md)
 
 ### Tái lập và tài liệu
 
