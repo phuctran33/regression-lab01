@@ -132,7 +132,7 @@ class PredictionAppTests(TestCase):
             app.predict_button.click()
             first_image = bytes(app.chart.value)
             self.assertTrue(first_image.startswith(b"\x89PNG"))
-            self.assertIn("OLS · body_mass_g", app.result.value)
+            self.assertIn("OLS · khối lượng dự đoán", app.result.value)
             for name in ("M1", "M2", "M3"):
                 self.assertIn(f"{name} ", app.result.value)
             self.assertIn("CI 95%", app.result.value)
@@ -145,7 +145,8 @@ class PredictionAppTests(TestCase):
             app.predict_button.click()
             values = {feature: widget.value for feature, widget in app.controls.items()}
             expected = self.models["M3"].predict(pd.DataFrame([values]))[0]
-            self.assertIn(f"M3 · body_mass_g = {expected:,.1f} g", app.result.value)
+            self.assertIn("M3 · khối lượng dự đoán", app.result.value)
+            self.assertIn(f"{expected:,.1f} g", app.result.value)
             self.assertNotIn("PI 95%", app.result.value)
             self.assertTrue(bytes(app.chart.value).startswith(b"\x89PNG"))
             self.assertNotEqual(first_image, bytes(app.chart.value))
