@@ -76,7 +76,7 @@ Với mỗi biến số, `SplineTransformer` thay một cột x bằng 4 hàm c�
 
 ### 3.3.2 Ba biểu đồ conditional prediction
 
-Giá trị tham chiếu lấy từ train: cánh bơi 197 mm, mỏ dài 44.5 mm, mỏ sâu 17.3 mm, loài Adelie, giới tính cái. Mỗi biểu đồ thay đổi một biến, vẽ đường dự đoán M2 và OLS, kèm dải CI 95% bootstrap (500 lần refit) cho M2 và vùng ngoài miền train (xám): `figures/fig04_conditional_flipper_length_mm.png`, `figures/fig04_conditional_bill_length_mm.png`, `figures/fig04_conditional_bill_depth_mm.png`. Bản bám miền dữ liệu từng loài là `figures/fig05_conditional_by_species.png`. Đây là dự đoán có điều kiện, không phải quan hệ nhân quả; tổ hợp tham chiếu (Adelie với cánh bơi 230 mm chẳng hạn) có thể không tồn tại trong dữ liệu, nên hình 05 đáng tin hơn khi đọc theo từng loài.
+Giá trị tham chiếu lấy từ train: cánh bơi 197 mm, mỏ dài 44.5 mm, mỏ sâu 17.3 mm, loài Adelie, giới tính cái. Mỗi biểu đồ thay đổi một biến, vẽ đường dự đoán M2, OLS và M3, kèm dải 95% bootstrap theo từng điểm (500 lần refit) cho M2 và OLS và vùng ngoài miền train (xám): `figures/fig04_conditional_flipper_length_mm.png`, `figures/fig04_conditional_bill_length_mm.png`, `figures/fig04_conditional_bill_depth_mm.png`. Bản bám miền dữ liệu từng loài là `figures/fig05_conditional_by_species.png`. Đây là dự đoán có điều kiện, không phải quan hệ nhân quả; tổ hợp tham chiếu (Adelie với cánh bơi 230 mm chẳng hạn) có thể không tồn tại trong dữ liệu, nên hình 05 đáng tin hơn khi đọc theo từng loài.
 
 Độ dốc trung bình trong khoảng p5–p95 của train và biên độ lệch khỏi đường thẳng bình phương tối thiểu của chính đường cong (`tables/C_curvature_summary.csv`):
 
@@ -96,7 +96,7 @@ Giá trị tham chiếu lấy từ train: cánh bơi 197 mm, mỏ dài 44.5 mm, 
 
 H0: không cần thành phần phi tuyến so với mô hình tuyến tính (cùng các biến giả).
 
-Có thể dùng F-test có điều kiện vì hai mô hình lồng nhau: cột của OLS biểu diễn chính xác được bằng cơ sở spline (sai số số học 4.6e-13), M2 có 16 tham số so với 7 của OLS (thêm 9), và mốc uniform chỉ phụ thuộc vào X chứ không phụ thuộc y. Các p-value dưới đây vẫn chỉ mang tính mô tả: `n_knots = 3` được chọn bằng CV trên cùng dữ liệu, các mốc phụ thuộc vào miền train, và phép kiểm định dùng 273 mẫu train (không dùng test).
+Có thể dùng F-test có điều kiện vì hai mô hình lồng nhau: cột của OLS biểu diễn chính xác được bằng cơ sở spline (sai số số học dưới 1e-12), M2 có 16 tham số so với 7 của OLS (thêm 9), và mốc uniform chỉ phụ thuộc vào X chứ không phụ thuộc y. Các p-value dưới đây vẫn chỉ mang tính mô tả: `n_knots = 3` được chọn bằng CV trên cùng dữ liệu, các mốc phụ thuộc vào miền train, và phép kiểm định dùng 273 mẫu train (không dùng test).
 
 | Phương pháp | Thống kê | p |
 | --- | ---: | ---: |
@@ -115,7 +115,7 @@ Kết quả từ các góc nhìn đều cùng hướng. **Chưa đủ bằng ch�
 - Test chỉ có 69 mẫu; nhiều nhóm loài × giới tính chỉ có vài mẫu.
 - Median/mode imputation được dùng cho các giá trị thiếu (2 dòng thiếu số đo trong dữ liệu gốc, 11 dòng thiếu giới tính); các dòng thiếu `sex` có sai số lớn hơn.
 - Các p-value ở 3.3.3 là mô tả vì `n_knots` được chọn bằng CV; residual bootstrap giả định phần dư hoán đổi được (Levene chưa phát hiện khác biệt phương sai theo loài).
-- Kết quả chính của M2 đã được chạy lại trên môi trường local với scikit-learn 1.8.0 theo phiên bản ghim trong `requirements.txt`. Trên nhánh main tại thời điểm thực hiện phân tích, source/models/m3.py chưa có estimator (ESTIMATOR = None), nên báo cáo không vẽ hoặc sử dụng đường M3. Phần so sánh với M3 được tạm để lại cho phần đánh giá chung của nhóm sau khi mã M3 được merge và có thể chạy lại.
+- Bản tích hợp fit M3 trên cùng 273 mẫu. Trong miền p5–p95, độ lệch tối đa so với đường thẳng khớp riêng cho cánh bơi / mỏ dài / mỏ sâu là 9,53 / 5,11 / 12,70 g ở M3, so với 94,65 / 82,03 / 65,61 g ở M2. M3 ưu tiên độ trơn với λ=100 và ngoại suy tuyến tính ở hai biên. Dải theo từng điểm mô tả biến thiên của đường trung bình khi refit. Khoảng cho một cá thể có thêm sai số của cá thể. [Bảng độ cong](tables/C_curvature_summary.csv) · [Benchmark và khoảng cá thể](../integration.md)
 
 ## Tài liệu tham khảo
 

@@ -1,301 +1,154 @@
 
-
 ==============================================================================
-
 A. KIỂM TRA CẤU HÌNH, SỐ ĐẶC TRƯNG VÀ RÒ RỈ DỮ LIỆU
-
 ==============================================================================
-
 Cấu hình SplineTransformer: {'degree': 3, 'n_knots': 3, 'knots': 'uniform', 'include_bias': False, 'extrapolation': 'constant'}
-
 Estimator cuối: LinearRegression
-
 Hình dạng đặc trưng sau biến đổi: (273, 15) | spline: 12 | dummy: 3
-
 Tái hiện test tuần 1 (MAE 252.934, RMSE 308.237, R² 0.832): ĐẠT
-
  fold  n_fit  n_valid  median_imputer_dùng_fold_train  knots_dùng_min/max_fold_train  giá_trị_valid_ngoài_miền_fold_train
-
     1    218       55                            True                           True                                    1
-
     2    218       55                            True                           True                                    1
-
     3    218       55                            True                           True                                    2
-
     4    219       54                            True                           True                                    1
-
     5    219       54                            True                           True                                    1
-
 Mốc biên spline (min) khi fit toàn bộ train: {'flipper_length_mm': np.float64(172.0), 'bill_length_mm': np.float64(32.1), 'bill_depth_mm': np.float64(13.1)}
-
 => Imputer + SplineTransformer + OneHot được fit lại trong mỗi fold (cross_validate clone cả Pipeline).
-
 Số quan sát test nằm ngoài miền train (cần extrapolation): {'flipper_length_mm': 0, 'bill_length_mm': 0, 'bill_depth_mm': 0}
 
-
-
 ==============================================================================
-
 B. METRICS TEST, 5-FOLD CV, CHỌN n_knots (CHỈ TRÊN TRAIN)
-
 ==============================================================================
-
              MAE (g)   MSE (g²)  RMSE (g)     R²
-
 M2 (Spline)  252.934  95009.744   308.237  0.832
-
 OLS          256.683  94252.102   307.005  0.833
 
-
-
 5-fold CV trên train (RMSE = trung bình của RMSE từng fold):
-
                           MAE (g)   MSE (g²)  RMSE (g)     R²
-
 M2 (Spline) mean          234.404  88277.638   295.874  0.859
-
             std (ddof=1)   24.892  17199.879    30.332  0.037
-
 OLS         mean          225.586  84042.928   289.288  0.866
-
             std (ddof=1)   17.192  11682.629    21.083  0.023
 
-
-
 Chênh lệch theo fold (M2 − OLS):
-
  MAE (g)  MSE (g²)  RMSE (g)     R²  fold
-
   16.989  6061.253    10.023 -0.008     1
-
   26.763 17549.245    27.990 -0.033     2
-
   -2.131 -3432.350    -6.888  0.006     3
-
   -5.850 -4724.199    -7.837  0.006     4
-
    8.320  5719.599     9.646 -0.010     5
-
 MAE: M2 tốt hơn OLS ở 2 / 5 fold
 
-
-
 Chọn n_knots bằng 5-fold CV trên train (tái hiện bảng tuần 1):
-
  n_knots  MAE (g)  MSE (g²)  RMSE (g)    R²  MAE std  n_features
-
        3  234.404 88277.638   295.874 0.859   24.892          15
-
        4  236.070 88893.388   296.866 0.857   24.582          18
-
        5  239.801 90836.854   300.163 0.854   23.683          21
-
        6  241.045 92876.355   303.807 0.851   24.175          24
 
-
-
 Nested CV (outer 5-fold, inner 5-fold chọn n_knots):
-
  fold  n_knots được chọn  MAE (g)  RMSE (g)    R²
-
     1                  3  251.946   307.379 0.878
-
     2                  3  254.819   327.490 0.801
-
     3                  3  193.244   245.713 0.892
-
     4                  3  230.776   297.483 0.881
-
     5                  6  263.965   322.140 0.819
-
 MAE nested = 238.950 ± 28.295 | OLS CV = 225.586 ± 17.192
 
-
-
 Sai số M2 theo nhóm – test (bias = trung bình thực tế − dự đoán):
-
             n     MAE    RMSE   bias     nhóm
-
 species
-
 Adelie     35  263.02  316.96 -24.79  species
-
 Chinstrap  11  253.10  292.97  30.95  species
-
 Gentoo     23  237.51  301.83  -7.33  species
-
          n     MAE    RMSE    bias nhóm
-
 sex
-
 female  29  214.07  256.23   40.91  sex
-
 male    36  279.38  333.21  -19.33  sex
-
 thiếu    4  296.66  404.50 -296.66  sex
-
                    n     MAE    RMSE    bias         nhóm
-
 species   sex
-
 Adelie    female  14  215.58  255.26    1.89  species×sex
-
           male    19  299.30  356.18  -20.71  species×sex
-
           thiếu    2  250.36  311.10 -250.36  species×sex
-
 Chinstrap female   3  226.97  236.72  226.97  species×sex
-
           male     8  262.91  311.45  -42.56  species×sex
-
 Gentoo    female  12  209.08  261.99   39.92  species×sex
-
           male     9  251.99  300.13    4.25  species×sex
-
           thiếu    2  342.96  480.06 -342.96  species×sex
 
-
-
 Sai số M2 theo nhóm – oof_train (bias = trung bình thực tế − dự đoán):
-
              n     MAE    RMSE  bias     nhóm
-
 species
-
 Adelie     116  235.82  305.34 -3.32  species
-
 Chinstrap   57  243.22  304.29  9.58  species
-
 Gentoo     100  227.70  282.91  2.29  species
-
           n     MAE    RMSE  bias nhóm
-
 sex
-
 female  136  207.20  261.13 -4.18  sex
-
 male    132  260.97  327.18  7.39  sex
-
 thiếu     5  272.25  372.41 -3.43  sex
-
                    n     MAE    RMSE    bias         nhóm
-
 species   sex
-
 Adelie    female  59  212.45  263.15  -49.79  species×sex
-
           male    54  261.85  342.35   34.97  species×sex
-
           thiếu    3  226.82  365.49  221.21  species×sex
-
 Chinstrap female  31  226.44  288.83   98.09  species×sex
-
           male    26  263.23  321.75  -95.94  species×sex
-
 Gentoo    female  46  187.51  237.82  -14.59  species×sex
-
           male    52  258.92  313.47   30.41  species×sex
-
           thiếu    2  340.40  382.55 -340.40  species×sex
 
-
-
-Shapiro (phần dư OOF M2): {'W': 0.9939506694350976, 'p': 0.34536713985843026}
-
-Levene theo loài (phần dư OOF M2): {'stat': 0.13371592917146527, 'p': 0.8748964426977656}
-
-
+Shapiro (phần dư OOF M2): {'W': 0.9939506695540629, 'p': 0.34536715679767865}
+Levene theo loài (phần dư OOF M2): {'stat': 0.13371592917146527, 'p': 0.8748964426977626}
 
 ==============================================================================
-
 D. PAIRED BOOTSTRAP M2 vs OLS (69 mẫu test, 2000 lần, seed 42)
-
 ==============================================================================
-
                    chỉ số  quan sát  trung bình bootstrap  CI95 thấp  CI95 cao  CI chứa 0  tỷ lệ Δ<0
-
  ΔMAE (g)  [chỉ số chính]    -3.749                -3.932    -16.506     8.406       True      0.734
-
 ΔRMSE (g) [phụ, khám phá]     1.231                 1.164    -10.852    13.233       True      0.430
-
 ΔR²       [phụ, khám phá]    -0.001                -0.001     -0.015     0.012       True      0.570
-
 MAE test: M2 252.934 | OLS 256.683 | số mẫu M2 sai số tuyệt đối nhỏ hơn OLS: 35/69
 
-
-
 ==============================================================================
-
 C. CONDITIONAL PREDICTION (giữ các biến khác cố định, không phải quan hệ nhân quả)
-
 ==============================================================================
-
 Giá trị tham chiếu (median / mode của TRAIN): {'flipper_length_mm': 197.0, 'bill_length_mm': 44.5, 'bill_depth_mm': 17.3, 'species': 'Adelie', 'sex': 'female'}
-
-M3 chưa có estimator -> bỏ qua đường M3.
-
+Đã nạp M3 và fit trên cùng 273 mẫu train.
              biến  tỷ lệ điểm p5–p95 mà đường OLS nằm trong dải CI95 của M2  |M2 − OLS| lớn nhất trong p5–p95 (g)  nửa bề rộng dải CI95 M2, trung bình (g)
-
 flipper_length_mm                                                       1.0                               268.788                                  240.168
-
    bill_length_mm                                                       1.0                                62.573                                  181.134
-
     bill_depth_mm                                                       1.0                               105.198                                  229.915
-
              biến mô hình  biên độ lệch khỏi đường thẳng (g)  tại x (mm)  độ dốc TB (g/mm)  dốc đoạn thấp  dốc đoạn giữa  dốc đoạn cao khoảng p5–p95 (mm)  tổng thay đổi theo đường thẳng p5→p95 (g)
-
 flipper_length_mm      M2                              94.65      181.14             17.29           7.11          19.90         20.56        181.0–225.0                                     760.86
-
 flipper_length_mm     OLS                               0.00      181.14             12.97          12.97          12.97         12.97        181.0–225.0                                     570.88
-
+flipper_length_mm      M3                               9.53      181.14             13.14          12.21          13.16         13.96        181.0–225.0                                     578.04
    bill_length_mm      M2                              82.03       51.90             17.77          29.13          23.34         -6.14          35.6–52.0                                     292.10
-
    bill_length_mm     OLS                               0.00       35.95             16.20          16.20          16.20         16.20          35.6–52.0                                     266.29
-
+   bill_length_mm      M3                               5.11       51.90             15.83          16.89          15.92         14.46          35.6–52.0                                     260.18
     bill_depth_mm      M2                              65.61       13.90             93.50         139.30          94.28         50.87          13.9–20.0                                     574.06
-
     bill_depth_mm     OLS                               0.00       14.07             75.62          75.62          75.62         75.62          13.9–20.0                                     464.30
-
-
+    bill_depth_mm      M3                              12.70       13.90             78.79          87.57          78.80         70.60          13.9–20.0                                     483.80
 
 ==============================================================================
-
 E. NHU CẦU THÀNH PHẦN PHI TUYẾN
-
 ==============================================================================
-
 Kiểm tra lồng nhau: sai số lớn nhất khi biểu diễn OLS bằng cơ sở spline = 2.56e-13 (≈ 0 ⇒ OLS ⊂ M2)
-
 Tham số: OLS = 7, M2 = 16 (thêm 9) | RSS OLS = 21,640,248, RSS M2 = 20,558,914
-
 F-test kinh điển (chung 3 biến): F(9, 257) = 1.502, p = 0.1473
-
              biến  df_tử  df_mẫu      F      p  p_Holm
-
 flipper_length_mm      3     257 1.1774 0.3188  0.6822
-
    bill_length_mm      3     257 1.4547 0.2274  0.6822
-
     bill_depth_mm      3     257 0.8997 0.4419  0.6822
-
 Wald–F bền vững (HC3) cho 9 thành phần phi tuyến: F = 1.596, p = 0.1166
-
 AIC (trong mẫu): OLS 3093.60 | M2 3097.61   BIC: OLS 3118.87 | M2 3155.36
 
-
-
 Residual bootstrap dưới H0 (1000 lần):
-
              biến  biên độ quan sát (g)  null median (g)  null p95 (g)  p bootstrap
-
 flipper_length_mm                94.651           57.032       116.104        0.145
-
    bill_length_mm                82.028           43.493        95.800        0.104
-
     bill_depth_mm                65.606           52.867       103.911        0.350
+Shapiro (phần dư M2 trên train): {'W': 0.9932721535296063, 'p': 0.25905465906494796}
 
-Shapiro (phần dư M2 trên train): {'W': 0.9932721534560285, 'p': 0.2590546507950585}
-
-
-
-Đã ghi kết quả vào /Users/khangcero/regression-lab01/regression-lab01/report/m2_week2
+Đã ghi kết quả vào report/m2_week2

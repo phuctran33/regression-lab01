@@ -1,0 +1,13 @@
+{% extends 'voila/templates/lab/index.html.j2' %}
+{% block notebook_css %}
+{{ resources.include_js("static/voila-style.js") }}
+{{ super.super() }}
+<style>
+body[data-voila] {background:#f4f3ec;margin:0}
+.jp-mod-noOutputs.jp-mod-noInput,.jp-OutputArea-prompt:empty {display:none}
+#rendered_cells {max-width:1180px;margin:auto}
+#loading {position:fixed;inset:0;display:grid;place-content:center;background:#f4f3ec;color:#173836;font:16px/1.6 system-ui;z-index:2}
+#loading strong {font:italic 36px Georgia,serif}
+@media(max-width:600px) { #rendered_cells .jp-Cell,#rendered_cells .jp-OutputArea-output {padding:0}}
+</style>
+{% endblock %}

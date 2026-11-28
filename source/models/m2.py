@@ -5,6 +5,7 @@ from sklearn.preprocessing import SplineTransformer
 from ..modeling import make_pipeline, run_model
 
 NAME = "M2"
+KNOT_GRID = (3, 4, 5, 6)
 
 # Estimator hồi quy cuối cùng
 ESTIMATOR = LinearRegression()

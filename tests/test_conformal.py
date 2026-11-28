@@ -1,0 +1,135 @@
+import re
+import struct
+import unittest
+from unittest.mock import patch
+
+import numpy as np
+import pandas as pd
+from sklearn.pipeline import Pipeline
+
+from source.analysis.uncertainty import (
+    conformal_radius, fit_calibrated, interval_summary, proper_calibration_split,
+)
+from source.modeling import FEATURES, TARGET, load_penguins, split_penguins
+from source.models import ols
+from source.prediction_figures import number
+from source.prediction_app import PredictionApp
+
+
+class ConformalTests(unittest.TestCase):
+    def test_order_statistics_and_small_calibration(self):
+        scores = np.arange(55, 0, -1)
+        self.assertEqual(conformal_radius(scores, 0.90), 51)
+        self.assertEqual(conformal_radius(scores, 0.95), 54)
+        self.assertTrue(np.isinf(conformal_radius([1, 2, 3], 0.95)))
+        with self.assertRaises(ValueError):
+            conformal_radius([np.nan], 0.95)
+        summary = interval_summary(np.array([0, 1, 2]), np.array([0, 0, 0]), np.array([1, 1, 1]))
+        self.assertEqual(summary["coverage"], 2 / 3)
+        self.assertEqual(summary["outside"], 1)
+        self.assertEqual(summary["width_g"], 1)
+
+    def test_all_calibration_and_inner_fits_use_only_proper_training(self):
+        train, test = split_penguins(load_penguins())
+        proper, cal = proper_calibration_split(train)
+        self.assertEqual((len(proper), len(cal), len(test)), (218, 55, 69))
+        self.assertEqual(set(proper.index) | set(cal.index), set(train.index))
+        self.assertTrue(test.index.intersection(train.index).empty)
+        original = Pipeline.fit
+        fit_sizes = set()
+
+        def track(pipeline, X, y=None, **kwargs):
+            if "regression" in pipeline.named_steps:
+                self.assertTrue(X.index.isin(proper.index).all())
+                self.assertTrue(X.index.equals(y.index))
+                fit_sizes.add(len(X))
+            return original(pipeline, X, y, **kwargs)
+
+        with patch.object(Pipeline, "fit", track):
+            models = fit_calibrated(proper, cal, ["OLS", "M1", "M2", "M3", "M4"])
+        self.assertEqual(fit_sizes, {174, 175, 218})
+        for model in models.values():
+            scores = np.sort(abs(cal[TARGET] - model.predictor.predict(cal[FEATURES])))
+            for level, rank in ((.9, 51), (.95, 54)):
+                point, lower, upper = model.interval(test[FEATURES], level)
+                np.testing.assert_allclose(point, model.predictor.predict(test[FEATURES]))
+                np.testing.assert_allclose(point - lower, scores[rank - 1])
+                np.testing.assert_allclose(upper - point, scores[rank - 1])
+        with self.assertRaises(ValueError):
+            fit_calibrated(train, cal, ["OLS"])
+
+    def test_widget_changes_point_and_interval_together(self):
+        train, test = split_penguins(load_penguins())
+        models = {"OLS": ols.build_model().fit(train[FEATURES], train[TARGET])}
+        app = PredictionApp(models, train, {TARGET: "Khối lượng (g)"}, test=test)
+        inputs = pd.DataFrame([{f: c.value for f, c in app.controls.items()}])
+        with patch.object(Pipeline, "fit", side_effect=AssertionError("Unexpected refit")):
+            for level in (.9, .95):
+                app.level.value = level
+                app.predict_button.click()
+                for values in app.calibrated["OLS"].interval(inputs, level):
+                    self.assertIn(number(values[0]), app.result.value)
+                self.assertIn("69 mẫu test", app.result.value)
+                self.assertTrue(bytes(app.chart.value).startswith(b"\x89PNG"))
+            app.protocol.value = "full"
+            app.predict_button.click()
+            self.assertIn(number(models["OLS"].predict(inputs)[0]), app.result.value)
+            self.assertIn("CI 95%", app.result.value)
+            self.assertTrue(app.level.disabled)
+
+    def test_error_views_use_heldout_rows_and_the_selected_protocol(self):
+        train, test = split_penguins(load_penguins())
+        full = ols.build_model().fit(train[FEATURES], train[TARGET])
+        app = PredictionApp({"OLS": full}, train, {TARGET: "Khối lượng (g)"}, test=test)
+        self.assertEqual(number(3571.74), "3.571,7")
+        for protocol, fit in (("conformal", app.calibrated["OLS"].predictor), ("full", full)):
+            app.protocol.value = protocol
+            expected = test[TARGET] - fit.predict(test[FEATURES])
+            pd.testing.assert_series_equal(app.residuals[protocol, "OLS"], expected)
+            app.predict_button.click()
+            app.view.value = "hist"
+            self.assertIn(f"Trung vị {number(expected.median())}", app.chart.description)
+            app.view.value = "box"
+            for species, errors in expected.abs().groupby(test.species):
+                cells = [species, str(len(errors)), *[number(q) for q in errors.quantile([.25, .5, .75])]]
+                self.assertIn("".join(f"<td>{value}</td>" for value in cells), app.caption.value)
+            self.assertTrue(bytes(app.chart.value).startswith(b"\x89PNG"))
+
+    def test_edit_during_figure_render_discards_previous_result(self):
+        train, _ = split_penguins(load_penguins())
+        model = ols.build_model().fit(train[FEATURES], train[TARGET])
+        app = PredictionApp({"OLS": model}, train, {})
+        field = app.controls["flipper_length_mm"]
+
+        def edit_while_drawing(*args):
+            field.value = field.value + 1
+            return b"old image", "old description", "old caption"
+
+        with patch("source.prediction_app.trend_plot", side_effect=edit_while_drawing):
+            app.predict_button.click()
+        self.assertFalse(app.rendered)
+        self.assertEqual(app.chart.value, b"")
+        self.assertIn("Bấm Dự đoán", app.result.value)
+        self.assertFalse(app.predict_button.disabled)
+        app.predict_button.click()
+        self.assertTrue(app.rendered)
+
+    def test_interval_graph_uses_one_mass_scale_across_coverage_levels(self):
+        train, test = split_penguins(load_penguins())
+        model = ols.build_model().fit(train[FEATURES], train[TARGET])
+        app = PredictionApp({"OLS": model}, train, {}, test=test)
+        point = pd.DataFrame([{key: control.value for key, control in app.controls.items()}])
+        axis_min = 500 * np.floor(train[TARGET].min() / 500)
+        span = 500 * np.ceil(train[TARGET].max() / 500) - axis_min
+        for level in (.90, .95):
+            app.level.value = level
+            app.predict_button.click()
+            mass, low, high = app.calibrated["OLS"].interval(point, level)
+            left, width = re.search(r'left:([.\d]+)%;width:([.\d]+)%', app.result.value).groups()
+            self.assertAlmostEqual(float(left), 100 * (low[0] - axis_min) / span, places=4)
+            self.assertAlmostEqual(float(width), 100 * (high[0] - low[0]) / span, places=4)
+            marker = re.search(r'<b style="left:([.\d]+)%', app.result.value).group(1)
+            self.assertAlmostEqual(float(marker), 100 * (mass[0] - axis_min) / span, places=4)
+            wide_w, wide_h = struct.unpack(">II", app.chart.value[16:24])
+            small_w, small_h = struct.unpack(">II", app.chart.compact[16:24])
+            self.assertLess(small_w / small_h, wide_w / wide_h)
