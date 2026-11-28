@@ -1,0 +1,15 @@
+species,n,MAE,RMSE,bias,nhóm,sex
+Adelie,35,263.02,316.96,-24.79,species,
+Chinstrap,11,253.1,292.97,30.95,species,
+Gentoo,23,237.51,301.83,-7.33,species,
+,29,214.07,256.23,40.91,sex,female
+,36,279.38,333.21,-19.33,sex,male
+,4,296.66,404.5,-296.66,sex,thiếu
+Adelie,14,215.58,255.26,1.89,species×sex,female
+Adelie,19,299.3,356.18,-20.71,species×sex,male
+Adelie,2,250.36,311.1,-250.36,species×sex,thiếu
+Chinstrap,3,226.97,236.72,226.97,species×sex,female
+Chinstrap,8,262.91,311.45,-42.56,species×sex,male
+Gentoo,12,209.08,261.99,39.92,species×sex,female
+Gentoo,9,251.99,300.13,4.25,species×sex,male
+Gentoo,2,342.96,480.06,-342.96,species×sex,thiếu

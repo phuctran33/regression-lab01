@@ -1,0 +1,6 @@
+fold,n_fit,n_valid,median_imputer_dùng_fold_train,knots_dùng_min/max_fold_train,giá_trị_valid_ngoài_miền_fold_train
+1,218,55,True,True,1
+2,218,55,True,True,1
+3,218,55,True,True,2
+4,219,54,True,True,1
+5,219,54,True,True,1

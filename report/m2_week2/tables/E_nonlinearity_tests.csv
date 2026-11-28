@@ -1,0 +1,6 @@
+phương pháp,thống kê,p
+"F-test lồng nhau (9 df, mọi biến)",1.5019320362351931,0.147318502567356
+Wald–F HC3 (9 df),1.5957431205291226,0.11662545081221326
+F-test từng biến (3 df): flipper_length_mm,1.1774386441387017,0.3188131193244373
+F-test từng biến (3 df): bill_length_mm,1.4547362541343485,0.2273971700975585
+F-test từng biến (3 df): bill_depth_mm,0.8996662291771592,0.44190628965222334
