@@ -4,7 +4,7 @@ Chạy từ thư mục gốc dự án:
     python -m source.analysis.m2_week2
 
 Script KHÔNG sửa code dùng chung hay code của thành viên khác: chỉ import
-`source.modeling`, `source.models.m2` và (nếu có) `source.models.m3` để vẽ thêm đường so sánh.
+`source.modeling`, `source.models.m2` và `source.models.m3` để vẽ thêm đường so sánh.
 Mọi kết quả ghi vào `report/m2_week2/`. Test set chỉ dùng để báo cáo, không dùng để chọn siêu tham số.
 """
 from __future__ import annotations
@@ -25,7 +25,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV, KFold, cross_val_predict, cross_validate
 
 from source.modeling import CATEGORICAL, FEATURES, TARGET, load_penguins, make_pipeline, split_penguins
-from source.models import m2
+from source.models import m2, m3
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
@@ -33,7 +33,7 @@ SEED = 42
 N_BOOT = 2000          # paired bootstrap (Issue #11)
 N_CURVE_BOOT = 500     # bootstrap refit để vẽ dải bất định của đường cong
 N_NULL_BOOT = 1000     # residual bootstrap dưới H0 tuyến tính
-KNOT_GRID = (3, 4, 5, 6)
+KNOT_GRID = m2.KNOT_GRID
 NUMERIC = [f for f in FEATURES if f not in CATEGORICAL]
 
 OUT = Path(__file__).resolve().parents[2] / "report" / "m2_week2"
@@ -231,7 +231,7 @@ def main():
         tbl.to_csv(TAB / f"B_group_errors_{tag}.csv", index=False)
         print(f"\nSai số M2 theo nhóm – {tag} (bias = trung bình thực tế − dự đoán):")
         for p_ in parts:
-            print(p_.to_string())
+            print("\n".join(line.rstrip() for line in p_.to_string().splitlines()))
     RESULTS["B"]["oof_overall"] = metrics(ytr, oof)
 
     # ---- biểu đồ actual vs predicted, residual
@@ -320,17 +320,9 @@ def main():
     print("Giá trị tham chiếu (median / mode của TRAIN):", ref)
     RESULTS["C"] = {"reference": ref}
 
-    models = {"M2": m2_full, "OLS": ols}
-    try:
-        from source.models import m3 as m3_mod  # PR của Hưng; bản main hiện chỉ là bản mẫu (ESTIMATOR=None)
-        if getattr(m3_mod, "ESTIMATOR", None) is not None:
-            models["M3"] = m3_mod.build_model().fit(Xtr, ytr)
-            print("Đã nạp M3 (read-only, không sửa).")
-        else:
-            print("M3 chưa có estimator -> bỏ qua đường M3.")
-    except Exception as exc:  # noqa: BLE001 - M3 chỉ là phần phụ, không để lỗi làm hỏng phân tích M2
-        print("Không nạp được M3, bỏ qua:", repr(exc))
-    RESULTS["C"]["m3_loaded"] = "M3" in models
+    models = {"M2": m2_full, "OLS": ols, "M3": m3.build_model().fit(Xtr, ytr)}
+    print("Đã nạp M3 và fit trên cùng 273 mẫu train.")
+    RESULTS["C"]["m3_loaded"] = True
 
     def make_frame(base, var, values):
         df = pd.DataFrame([base] * len(values))
@@ -402,7 +394,7 @@ def main():
         for nm, c, ls in (("OLS", C_OLS, "-"), ("M2", C_M2, "-"), ("M3", C_M3, "--")):
             if nm not in curves:
                 continue
-            lab = {"OLS": "OLS", "M2": "M2 – Cubic Spline", "M3": "M3 (PR của Hưng, chưa merge)"}[nm]
+            lab = {"OLS": "OLS", "M2": "M2 – Cubic Spline", "M3": "M3 – Smoothing spline"}[nm]
             ax.plot(grids[f], curves[nm][f], color=c, ls=ls, lw=2, label=lab)
             if (nm, f) in bands:
                 ax.fill_between(grids[f], *bands[(nm, f)], color=c, alpha=0.13)
@@ -552,7 +544,7 @@ def main():
     print("Shapiro (phần dư M2 trên train):", RESULTS["E"]["shapiro_train_resid_full"])
 
     (OUT / "results.json").write_text(json.dumps(RESULTS, default=jsonable, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"\nĐã ghi kết quả vào {OUT}")
+    print(f"\nĐã ghi kết quả vào {OUT.relative_to(OUT.parents[1])}")
 
 
 if __name__ == "__main__":
