@@ -1,7 +1,9 @@
+from sklearn.linear_model import HuberRegressor
+
 from ..modeling import make_pipeline, run_model
 
 NAME = "M4"
-ESTIMATOR = None  # TODO: Gán một estimator hồi quy tuyến tính do bạn chọn.
+ESTIMATOR = HuberRegressor(epsilon=1.2, alpha=0.001, max_iter=1000, tol=1e-6)
 
 
 def build_model():
