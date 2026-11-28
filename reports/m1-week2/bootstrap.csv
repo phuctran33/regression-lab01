@@ -1,0 +1,2 @@
+﻿contrast,delta_g,ci_low_g,ci_high_g,n,n_resamples,seed
+MAE(M1)-MAE(OLS),-0.33324893160126678,-1.0372491707585785,0.42124156850546701,69,2000,42
