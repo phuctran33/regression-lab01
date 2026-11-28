@@ -58,8 +58,15 @@ function render({ model, el }) {
   range.addEventListener("input", () => update(range));
   number.addEventListener("input", () => update(number));
   model.on("change:value", syncValue);
+  function reset() {
+    number.value = model.get("value");
+    range.value = number.value;
+    number.removeAttribute("aria-invalid");
+    hint.textContent = "";
+  }
+  model.on("change:reset_count", reset);
   syncValue();
   el.append(label, number, range, limits, hint);
-  return () => model.off("change:value", syncValue);
+  return () => { model.off("change:value", syncValue); model.off("change:reset_count", reset); };
 }
 export default { render };

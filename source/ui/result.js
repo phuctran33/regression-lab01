@@ -12,8 +12,11 @@ function render({ model, el }) {
   output.addEventListener("click", (event) => {
     const jump = event.target.closest(".pg-jump");
     if (!jump) return;
-    const target = jump.dataset.target === "chart" ? ".pg-views input:checked" : ".pg-answer h3";
-    el.closest(".penguin-panel")?.querySelector(target)?.focus();
+    const targets = {chart: ".pg-view .pg-views input:checked", predict: ".pg-command button:not(.pg-reset)",
+                     result: ".pg-answer h3"};
+    const panel = el.closest(".penguin-panel");
+    const visible = [...panel.querySelectorAll(targets[jump.dataset.target])].find(node => node.getClientRects().length);
+    (visible || panel.querySelector(".pg-view h3"))?.focus();
   });
   function show() {
     // Editing a measurement must not move the form underneath the pointer.
@@ -27,13 +30,18 @@ function render({ model, el }) {
     if (details && wasOpen) details.open = true;
   }
   function announce() { status.textContent = model.get("announcement"); }
+  function closeDetails() {
+    for (const details of output.querySelectorAll("details[open]")) details.open = false;
+  }
   model.on("change:value", show);
   model.on("change:announcement", announce);
+  model.on("change:reset_count", closeDetails);
   show();
   announce();
   return () => {
     model.off("change:value", show);
     model.off("change:announcement", announce);
+    model.off("change:reset_count", closeDetails);
   };
 }
 export default { render };

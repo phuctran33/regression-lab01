@@ -123,7 +123,10 @@ def error_plot(view, name, residuals, species):
         ax.set(xlabel="Thực tế − dự đoán (g)", ylabel="Số cá thể")
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
         alt = f"Histogram phần dư {name}, {len(residuals)} cá thể test. Trung vị {number(np.median(residuals))} g."
-        caption = alt + " Phần dư dương nghĩa là mô hình ước lượng thấp hơn cân nặng thực."
+        median = np.median(residuals)
+        direction = "thấp" if median > 0 else "cao"
+        bias = f" Dấu của trung vị cho thấy xu hướng dự đoán {direction} trên tập này." if median else " Trung vị phần dư bằng 0."
+        caption = alt + bias + " Phần dư dương nghĩa là mô hình ước lượng thấp hơn cân nặng thực."
         rows = [(number(lo), number(hi), int(n)) for lo, hi, n in zip(bins[:-1], bins[1:], counts)]
         caption += table(["Từ (g)", "Đến (g)", "Số cá thể"], rows)
     else:
@@ -139,5 +142,8 @@ def error_plot(view, name, residuals, species):
                 for n, group in zip(names, data)]
         alt = f"Sai số tuyệt đối của {name} theo loài trên {len(residuals)} cá thể test."
         caption = alt + " Hộp chứa 50% giá trị giữa. Vạch trong hộp là trung vị. Số cá thể mỗi loài khác nhau."
+        medians = groups.median()
+        caption += (f" Trung vị sai số lớn nhất ở {escape(str(medians.idxmax()))} ({number(medians.max())} g), "
+                    f"nhỏ nhất ở {escape(str(medians.idxmin()))} ({number(medians.min())} g).")
         caption += table(["Loài", "n", "Q1 (g)", "Trung vị (g)", "Q3 (g)"], rows)
     return finish(fig, categorical_y=view == "box"), alt, caption

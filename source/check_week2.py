@@ -53,6 +53,8 @@ def execute_notebook():
     for folder in ('source', 'data'):
         shutil.copytree(ROOT / folder, temporary / folder,
                         ignore=shutil.ignore_patterns('__pycache__', '.ipynb_checkpoints'))
+    (temporary / 'report').mkdir()
+    shutil.copy2(ROOT / 'report/comparison.json', temporary / 'report/comparison.json')
     kernel_name = 'lab01-week2-check'
     kernel_dir = temporary / 'jupyter/kernels' / kernel_name
     kernel_dir.mkdir(parents=True)

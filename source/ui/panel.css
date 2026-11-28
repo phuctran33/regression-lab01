@@ -1,45 +1,49 @@
 .penguin-panel {
-  --ink:#152d46; --muted:#465e71; --action:#234d83; --rule:#c6d4df; --edge:#72899b;
-  --ice:#f1f6fa; --focus:#a64c02; --mark:#ffc675; --result:#1c3858;
+  --ink:#173836; --muted:#465e5b; --action:#125c58; --rule:#cddbd5; --edge:#748b84;
+  --ice:#edf4ef; --paper:#faf7ef; --focus:#a14609; --mark:#ffe0a4; --result:#183d3e;
   --space:8px; --gutter:clamp(16px,2.6cqw,32px);
   --display:PalmerDisplay,"Trebuchet MS",system-ui,sans-serif;
   font:15px/1.45 system-ui,sans-serif; color:var(--ink); color-scheme:light;
-  container-type:inline-size; background:white; border:1px solid var(--rule); border-radius:12px;
+  container-type:inline-size; background:white; border:1px solid var(--rule); border-radius:16px;
 }
 .penguin-panel *, .penguin-panel *::before, .penguin-panel *::after {box-sizing:border-box}
 .penguin-panel .widget-html, .penguin-panel .widget-html-content {width:100%; min-width:0; margin:0}
 .penguin-panel .widget-html-content {white-space:normal; color:var(--ink); font:inherit}
 .penguin-panel :is(h2,h3,p,dl,dt,dd,figure) {margin:0}
 .penguin-panel h2,.penguin-panel h3 {color:var(--ink)}
-.penguin-panel .pg-heading {display:flex; align-items:center; justify-content:space-between; gap:24px; padding:16px var(--gutter); background:#edf4fb; border-radius:11px 11px 0 0}
-.penguin-panel .pg-heading h2 {font:600 clamp(34px,6cqw,66px)/.99 var(--display); letter-spacing:-.035em; color:#193855}
-.penguin-panel .pg-heading p {max-width:62ch; margin-top:12px; color:#3c556d; font:400 clamp(14px,1.6cqw,17px)/1.45 Georgia,serif}
-.penguin-panel .pg-heading figure {flex:none; text-align:center}
-.penguin-panel .pg-heading img {display:block; width:clamp(108px,18cqw,200px); height:auto; mix-blend-mode:multiply}
-.penguin-panel .pg-heading a {font:11px/1.5 system-ui,sans-serif; color:#405970; text-underline-offset:2px}
-.penguin-panel .pg-answer,.penguin-panel .pg-notice {padding:20px var(--gutter) 14px; background:var(--result); color:#fff; font-variant-numeric:tabular-nums}
+.penguin-panel .pg-heading {isolation:isolate; position:relative; display:flex; align-items:center; min-height:118px; padding:15px var(--gutter); overflow:hidden; border-radius:15px 15px 0 0; background:var(--paper)}
+.penguin-panel .pg-heading .pg-shore {position:absolute; z-index:-1; inset:0 0 0 auto; width:65%; height:100%; object-fit:cover; object-position:50% 63%; mask-image:linear-gradient(90deg,transparent,#000 42%)}
+.penguin-panel .pg-heading h2 {font:600 clamp(35px,5.2cqw,61px)/1 var(--display); letter-spacing:-.05em}
+.penguin-panel .pg-heading h2 em {font:italic 1.07em/.95 Georgia,serif; color:#23594e; letter-spacing:-.058em}
+.penguin-panel .pg-heading p {max-width:48ch; margin-top:7px; color:#354f47; font:400 clamp(14px,1.5cqw,16px)/1.4 system-ui,sans-serif}
+.penguin-panel .pg-specimen {display:flex; align-items:center; justify-content:space-between; gap:8px; padding-bottom:8px; border-bottom:1px solid var(--rule)}
+.penguin-panel .pg-specimen a {color:var(--muted); font:11px/1.4 system-ui,sans-serif; text-align:center; flex:0 1 93px; text-decoration:none}
+.penguin-panel .pg-specimen a:hover small {text-decoration:underline}
+.penguin-panel .pg-specimen img {display:block; height:40px; width:100%; object-fit:contain; mix-blend-mode:multiply}
+.penguin-panel .pg-specimen small {font:inherit}
+.penguin-panel .pg-answer,.penguin-panel .pg-notice {padding:20px var(--gutter) 14px; background:linear-gradient(108deg,var(--result) 25%,#1e4543 70%,#204643); color:#fff; font-variant-numeric:tabular-nums}
 .penguin-panel .pg-readout {display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(0,1fr); align-items:center; gap:clamp(16px,3cqw,40px)}
 .penguin-panel .pg-point {display:grid; gap:3px}
-.penguin-panel .pg-point h3,.penguin-panel .pg-band > div:first-child,.penguin-panel .pg-evidence dt {font:600 13px/1.35 system-ui,sans-serif; color:#dce9f5}
+.penguin-panel .pg-point h3,.penguin-panel .pg-band > div:first-child,.penguin-panel .pg-evidence dt {font:600 13px/1.35 system-ui,sans-serif; color:#d9e8df}
 .penguin-panel .pg-mass {font:600 clamp(30px,4.3cqw,50px)/1.1 var(--display); letter-spacing:-.05em; overflow-wrap:anywhere; color:white}
-.penguin-panel .pg-point > span,.penguin-panel .pg-evidence small,.penguin-panel .pg-scale {color:#c9daea; font-size:12px}
+.penguin-panel .pg-point > span,.penguin-panel .pg-evidence small,.penguin-panel .pg-scale {color:#c3dcd3; font-size:12px}
 .penguin-panel .pg-band,.penguin-panel .pg-evidence {min-width:0}
 .penguin-panel .pg-bounds {display:block; font-size:clamp(16px,2cqw,22px); margin-top:4px; line-height:1.35; font-weight:600; color:white}
-.penguin-panel .pg-track {position:relative; height:6px; background:#71859a; border-radius:4px; margin:12px 1px 5px}
-.penguin-panel .pg-track i {position:absolute; top:0; height:6px; background:#fff0ac; border-inline:2px solid white}
+.penguin-panel .pg-track {position:relative; height:6px; background:#7c9188; border-radius:4px; margin:12px 1px 5px}
+.penguin-panel .pg-track i {position:absolute; top:0; height:6px; background:#fffae8; border-inline:2px solid white}
 .penguin-panel .pg-track b {position:absolute; top:50%; width:11px; height:11px; background:white; border:2px solid #233e5b; outline:1px solid white; transform:translate(-50%,-50%) rotate(45deg)}
 .penguin-panel .pg-scale {display:flex; justify-content:space-between; gap:8px}
-.penguin-panel .pg-evidence {border-left:1px solid #58718c; padding-left:clamp(12px,2cqw,26px); display:grid; gap:8px}
+.penguin-panel .pg-evidence {border-left:1px solid #73938a; padding-left:clamp(12px,2cqw,26px); display:grid; gap:8px}
 .penguin-panel .pg-evidence:empty {display:none}
 .penguin-panel .pg-evidence > div {display:block}
 .penguin-panel .pg-evidence :is(dt,dd) {float:none; display:block; width:auto; max-width:none; margin:0; padding:0; text-align:left}
 .penguin-panel .pg-evidence dd {font:600 20px/1.3 var(--display)}
 .penguin-panel .pg-evidence small {font:400 12px/1.4 system-ui,sans-serif}
 .penguin-panel .pg-evidence small {display:block; line-height:1.4}
-.penguin-panel .pg-reading {margin-top:12px; padding-top:6px; border-top:1px solid #506a84; display:flex; align-items:start; justify-content:space-between; gap:8px}
+.penguin-panel .pg-reading {margin-top:12px; padding-top:6px; border-top:1px solid #52776e; display:flex; align-items:start; justify-content:space-between; gap:8px}
 .penguin-panel details {font:14px/1.5 system-ui,sans-serif}
 .penguin-panel summary {cursor:pointer; width:fit-content; max-width:100%; padding:5px 0; font-weight:600}
-.penguin-panel .pg-answer details {color:#e0ebf5; max-width:80ch}
+.penguin-panel .pg-answer details {color:#eff4ea; max-width:80ch}
 .penguin-panel .pg-alternatives {margin-top:10px; color:white}
 .penguin-panel .pg-warning {padding:10px var(--gutter); background:#fff1d8; color:#663e13; border-inline-start:4px solid #9c5b0d}
 .penguin-panel .pg-notice {padding-block:20px; display:grid; align-content:center; gap:8px}
@@ -47,7 +51,7 @@
 .penguin-panel .pg-plot-placeholder {padding:24px 16px; background:var(--ice); border-left:3px solid var(--edge); color:var(--muted)}
 .penguin-panel .pg-layout {display:grid; grid-template-columns:minmax(268px,30%) minmax(0,1fr); align-items:start}
 .penguin-panel .pg-form,.penguin-panel .pg-view {min-width:0; padding:22px var(--gutter); gap:12px; align-items:stretch}
-.penguin-panel .pg-form {background:var(--ice); align-self:stretch; border-right:1px solid var(--rule)}
+.penguin-panel .pg-form {background:linear-gradient(145deg,#f2f5ec,#ebf3ef); align-self:stretch; border-right:1px solid var(--rule)}
 .penguin-panel .pg-form h3,.penguin-panel .pg-view h3 {font:600 23px/1.15 var(--display); letter-spacing:-.025em}
 .penguin-panel .pg-form .pg-settings {padding-top:14px; margin-top:3px; border-top:1px solid var(--rule)}
 .penguin-panel .pg-pair {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space)}
@@ -67,13 +71,13 @@
 .penguin-panel .widget-checkbox label {display:flex; align-items:center; gap:6px; color:var(--ink); white-space:normal; font-size:13px; cursor:pointer}
 .penguin-panel .widget-checkbox input {accent-color:var(--action); width:16px; height:16px}
 .penguin-panel .widget-button {background:var(--action); color:white; width:100%; min-height:42px; height:auto; padding:8px 16px; border-radius:6px; font:600 15px/1.4 system-ui,sans-serif; margin:0}
-.penguin-panel .widget-button:hover:not(:disabled) {background:#183758}
+.penguin-panel .widget-button:hover:not(:disabled) {background:#0e4443}
 .penguin-panel .widget-button:disabled {background:#526477; color:white; opacity:1}
 .penguin-panel .pg-jump,.penguin-panel .pg-jump-host {display:none}
-.penguin-panel .pg-views {display:flex; flex-wrap:wrap; gap:4px; border:0; padding:4px; margin:0; width:fit-content; max-width:100%; min-width:0; border-radius:8px; background:#ebf1f6}
+.penguin-panel .pg-views {display:flex; flex-wrap:wrap; gap:4px; border:0; padding:4px; margin:0; width:fit-content; max-width:100%; min-width:0; border-radius:8px; background:#eef1eb}
 .penguin-panel .pg-views label {position:relative; cursor:pointer; min-height:34px; padding:7px 14px; border-radius:5px; color:var(--muted); font:600 14px/1.4 system-ui,sans-serif}
 .penguin-panel .pg-views label:has(:checked) {color:white; background:var(--action)}
-.penguin-panel .pg-views label:hover:not(:has(:checked)) {color:var(--ink); background:#dbe6ef}
+.penguin-panel .pg-views label:hover:not(:has(:checked)) {color:var(--ink); background:#dde9e0}
 .penguin-panel .pg-views input,.penguin-panel .pg-sr-only {position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap}
 .penguin-panel .pg-view > .widget-dropdown {flex-direction:row; align-items:center; flex-wrap:wrap; gap:8px; min-height:36px}
 .penguin-panel .pg-view > .widget-dropdown select {flex:0 1 240px; max-width:100%}
@@ -95,13 +99,12 @@
   .penguin-panel .pg-readout {grid-template-columns:1fr 1.2fr; gap:14px}
   .penguin-panel .pg-evidence {grid-column:1/-1; grid-template-columns:repeat(2,minmax(0,1fr)); border-left:0; padding:0}
   .penguin-panel .pg-jump {display:inline-block; border:0; padding:5px 0; background:transparent; color:inherit; text-decoration:underline; text-underline-offset:3px; font:600 13px/1.5 system-ui,sans-serif; cursor:pointer}
-  .penguin-panel:has(.pg-answer) .pg-jump-host {display:block; text-align:center}
+  .penguin-panel .pg-jump-host {display:block; text-align:center}
+  .penguin-panel:has(.pg-answer) [data-target=predict],.penguin-panel:not(:has(.pg-answer)) [data-target=result],.penguin-panel:has(.pg-command button:disabled:not(.pg-reset)) [data-target=predict] {display:none}
 }
 @container (max-width:450px) {
-  .penguin-panel .pg-heading {gap:8px; padding:14px var(--gutter)}
-  .penguin-panel .pg-heading img {width:82px}
-  .penguin-panel .pg-heading figure {width:82px}
-  .penguin-panel .pg-heading p {margin-top:6px}
+  .penguin-panel .pg-heading {min-height:102px}
+  .penguin-panel .pg-heading .pg-shore {width:57%; opacity:.56; mask-image:linear-gradient(90deg,transparent,#000)}
   .penguin-panel .pg-form {display:flex; align-items:stretch}
   .penguin-panel .pg-views label {padding:6px 8px}
   .penguin-panel .pg-view > .widget-dropdown select {flex:1 1 100%}
@@ -110,10 +113,6 @@
   .penguin-panel .pg-scale {font-size:11px}
 }
 @container (max-width:315px) {
-  .penguin-panel .pg-heading {flex-wrap:wrap}
-  .penguin-panel .pg-heading figure {display:flex; align-items:center; gap:6px; width:100%; text-align:left}
-  .penguin-panel .pg-heading figcaption {min-width:0; overflow-wrap:anywhere}
-  .penguin-panel .pg-heading img {width:65px}
   .penguin-panel .pg-model-pair,.penguin-panel .pg-evidence {grid-template-columns:1fr}
   .penguin-panel .pg-caption :is(td,th) {padding:4px 2px; overflow-wrap:anywhere}
 }
@@ -121,4 +120,50 @@
   .penguin-panel .pg-answer,.penguin-panel .widget-button,.penguin-panel .pg-views label:has(:checked) {border:2px solid ButtonText}
   .penguin-panel .pg-track {border-bottom:1px solid CanvasText}
   .penguin-panel .pg-track i {border:3px solid Highlight}
+}
+/* A shared command bar keeps the specimen and the selected predictor in scope. */
+.penguin-panel .pg-command {display:grid; grid-template-columns:minmax(160px,1.4fr) minmax(146px,1.2fr) minmax(85px,.65fr) minmax(85px,.7fr) minmax(145px,.9fr); align-items:end; gap:8px 14px; padding:9px var(--gutter) 13px; background:#f5f5ef}
+.penguin-panel .pg-command .widget-button {min-height:36px}
+.penguin-panel .pg-command .pg-reset {color:var(--action); background:white; border:1px solid var(--edge)}
+.penguin-panel .pg-command .pg-reset:hover {background:#e3eee7}
+.penguin-panel .pg-nav {background:#fcfaf5; border-block:1px solid var(--rule); padding:0 var(--gutter)}
+.penguin-panel .pg-nav .pg-views {border-radius:0; background:transparent; padding:0; gap:4px 16px}
+.penguin-panel .pg-nav label {border-radius:0; border-bottom:3px solid transparent; padding:10px 1px}
+.penguin-panel .pg-nav label:has(:checked) {background:transparent; color:var(--action); border-bottom-color:var(--action)}
+.penguin-panel .pg-mass {font:600 clamp(32px,4.8cqw,56px)/1.13 var(--display); font-variant-numeric:tabular-nums; letter-spacing:-.035em}
+.penguin-panel .pg-point > span {width:fit-content; border:1px solid #72928a; padding:2px 9px; border-radius:2px 10px 10px 2px; margin-top:3px; color:#e5eee7}
+.penguin-panel .pg-evidence dd {color:#ffe6b0}
+.penguin-panel .pg-reading summary {font-weight:500}
+.penguin-panel .pg-view > .widget-html h3 {padding-left:12px; border-left:3px solid #ad6938}
+.penguin-panel .pg-caption {padding:10px 13px; border-top:0; border-left:3px solid #9cb7a6; background:#f3f6f1; border-radius:0 6px 6px 0}
+.penguin-panel .pg-caption tbody tr:nth-child(even) {background:#eaf1ea}
+.penguin-panel .pg-analysis {display:block}
+.penguin-panel .pg-analysis .pg-view {max-width:990px; margin:auto}
+.penguin-panel .pg-analysis .pg-chart {max-width:800px; margin:auto}
+.penguin-panel .pg-caption details[open] {overflow-x:auto}
+.penguin-panel .pg-method {padding:0; margin:14px 0; list-style:none; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(185px,100%),1fr)); gap:12px; counter-reset:step}
+.penguin-panel .pg-method li {border-top:2px solid #91b1be; padding:7px 2px; counter-increment:step}
+.penguin-panel .pg-method li::before {content:counter(step) ". "; color:var(--action); font-weight:bold}
+.penguin-panel .pg-method strong {color:var(--ink)}
+.penguin-panel .pg-glossary {padding:8px var(--gutter); border-top:1px solid var(--rule); background:var(--ice)}
+.penguin-panel .pg-glossary dl {display:grid; grid-template-columns:minmax(145px,1fr) 3fr; gap:8px 16px; padding:10px 0; max-width:85ch}
+.penguin-panel .pg-glossary :is(dt,dd) {width:auto; float:none; display:block; text-align:left; margin:0}
+.penguin-panel .pg-glossary dt {font-weight:650}
+@media(prefers-reduced-motion:no-preference) {
+  .penguin-panel .pg-answer {animation:pg-result-in .16s ease-out}
+  .penguin-panel .widget-button,.penguin-panel .pg-views label {transition:background-color .12s,border-color .12s}
+  @keyframes pg-result-in {from{opacity:.84}to{opacity:1}}
+}
+@container (max-width:800px) {
+  .penguin-panel .pg-command {grid-template-columns:repeat(3,minmax(0,1fr))}
+  .penguin-panel .pg-command .pg-reset {grid-column:span 2}
+}
+@container (max-width:460px) {
+  .penguin-panel .pg-command {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .penguin-panel .pg-command > :first-child {grid-column:1/-1}
+  .penguin-panel .pg-command .pg-reset {grid-column:auto}
+  .penguin-panel .pg-glossary dl {grid-template-columns:1fr; gap:2px}
+  .penguin-panel .pg-glossary dd {margin-bottom:8px}
+  .penguin-panel .pg-nav .pg-views {gap:0 12px}
+  .penguin-panel .pg-nav label {font-size:13px}
 }

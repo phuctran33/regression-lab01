@@ -2,7 +2,7 @@
 function render({ model, el }) {
   const group = document.createElement("fieldset");
   const legend = document.createElement("legend");
-  legend.textContent = "Biểu đồ";
+  legend.textContent = model.get("legend");
   legend.className = "pg-sr-only";
   group.className = "pg-views";
   group.lang = "vi";

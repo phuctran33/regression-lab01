@@ -13,6 +13,7 @@ import traitlets
 from .analysis.uncertainty import LEVELS, MODULES, fit_calibrated, interval_summary, proper_calibration_split
 from .evaluation import fit_ols_inference, ols_prediction_intervals
 from .modeling import CATEGORICAL, FEATURES, TARGET, regression_metrics
+from . import prediction_evidence as evidence
 from .prediction_figures import error_plot, number, trend_plot
 
 ASSETS = Path(__file__).with_name("ui")
@@ -31,11 +32,13 @@ class Measurement(anywidget.AnyWidget):
     max = traitlets.Float().tag(sync=True)
     step = traitlets.Float(.1).tag(sync=True)
     value = traitlets.Float().tag(sync=True)
+    reset_count = traitlets.Int().tag(sync=True)
     valid = traitlets.Bool(True).tag(sync=True)
 
 
 class FigurePicker(anywidget.AnyWidget):
     _esm = ASSETS / "figure-picker.js"
+    legend = traitlets.Unicode("Biểu đồ").tag(sync=True)
     options = traitlets.List().tag(sync=True)
     value = traitlets.Unicode("trend").tag(sync=True)
 
@@ -51,6 +54,7 @@ class Result(anywidget.AnyWidget):
     _esm = ASSETS / "result.js"
     value = traitlets.Unicode().tag(sync=True)
     announcement = traitlets.Unicode().tag(sync=True)
+    reset_count = traitlets.Int().tag(sync=True)
 
 
 class PredictionApp:
@@ -64,6 +68,11 @@ class PredictionApp:
         self.calibrated = {}
         self.performance = {}
         self.residuals = {}
+        self.predictions = {}
+        self.calibration_scores = {}
+        self.benchmark = None
+        self._figure_cache = {}
+        self._batch = False
         if test is not None:
             if not test.index.intersection(train.index).empty:
                 raise ValueError("Test rows overlap training rows.")
@@ -71,16 +80,20 @@ class PredictionApp:
             self.calibrated = fit_calibrated(self.proper, calibration, [n for n in models if n in MODULES])
             for name, fitted in models.items():
                 prediction = fitted.predict(test[FEATURES])
+                self.predictions["full", name] = prediction
                 self.residuals["full", name] = test[TARGET] - prediction
                 self.performance["full", name] = regression_metrics(test[TARGET], prediction)
             for name, fitted in self.calibrated.items():
+                self.calibration_scores[name] = np.abs(calibration[TARGET] - fitted.predictor.predict(calibration[FEATURES]))
                 for level in LEVELS:
                     point, low, high = fitted.interval(test[FEATURES], level)
                     self.performance[name, level] = {
                         **regression_metrics(test[TARGET], point),
                         **interval_summary(test[TARGET], low, high),
                     }
+                self.predictions["conformal", name] = point
                 self.residuals["conformal", name] = test[TARGET] - point
+            self.benchmark = evidence.verified_benchmark(test, {n: self.predictions["full", n] for n in models})
 
         self._revision = 0
         self._rendering = False
@@ -96,7 +109,7 @@ class PredictionApp:
             options=[(labels.get(f, f), f) for f in FEATURES], description="Biến trên biểu đồ")
         views = [("Xu hướng", "trend")]
         if self.residuals:
-            views.extend([("Phần dư", "hist"), ("Sai số theo loài", "box")])
+            views.extend([("Phần dư", "hist"), ("Sai số theo loài", "box"), ("Thực tế và dự đoán", "actual")])
         self.view = FigurePicker(options=views)
         self.compare = widgets.Checkbox(value=len(models) > 1 and not self.calibrated,
                                         description="So sánh các mô hình sẵn sàng", indent=False)
@@ -117,27 +130,47 @@ class PredictionApp:
                 control.observe(self._input_changed, names="valid")
             self.controls[feature] = control
 
+        self.defaults = {key: c.value for key, c in self.controls.items()}
+        self.presets = evidence.demo_rows(train)
+        self.preset = widgets.Dropdown(description="Cá thể mẫu", options=["Tùy chỉnh", *self.presets])
+        self.reset_button = widgets.Button(description="Khôi phục mặc định").add_class("pg-reset")
+        sections = [("Dự đoán cá thể", "predict")]
+        if self.residuals:
+            sections.append(("So sánh mô hình", "compare"))
+        if self.calibrated:
+            sections.extend([("Kiểm chứng khoảng", "verify"), ("Phương pháp", "method")])
+        self.section = FigurePicker(options=sections, value="predict", legend="Không gian phân tích").add_class("pg-nav")
+        self.reliability = FigurePicker(options=[("Cá thể test", "individual"), ("Bao phủ và độ rộng", "width")],
+                                        value="individual", legend="Kiểm chứng khoảng")
         art = b64encode((ASSETS / "palmer-penguins.png").read_bytes()).decode("ascii")
+        shore = b64encode((ASSETS / "palmer-shore.jpg").read_bytes()).decode("ascii")
         header = widgets.HTML(
-            '<header class="pg-heading" lang="vi"><div><h2 lang="en">Palmer Penguins</h2>'
-            '<p>Ước lượng khối lượng chim cánh cụt từ số đo hình thái, loài và giới tính.</p></div>'
-            f'<figure><img src="data:image/png;base64,{art}" alt="Ba loài Chinstrap, Gentoo và Adelie">'
-            '<figcaption><a href="https://allisonhorst.github.io/palmerpenguins/articles/art.html">'
-            'Artwork by @allison_horst</a></figcaption></figure></header>')
-        jump = Result(value='<button type="button" class="pg-jump">Đọc kết quả dự đoán</button>')
-        form = widgets.VBox([
-            widgets.HTML("<h3>Cá thể khảo sát</h3>"),
+            '<header class="pg-heading" lang="vi">'
+            f'<img class="pg-shore" src="data:image/jpeg;base64,{shore}" alt="">'
+            '<div><h2 lang="en">Palmer <em>Penguins</em></h2>'
+            '<p>Ước lượng khối lượng từ ba số đo, loài và giới tính.</p></div></header>')
+        specimen = widgets.HTML(
+            '<div class="pg-specimen"><h3>Cá thể khảo sát</h3>'
+            '<a href="https://allisonhorst.github.io/palmerpenguins/articles/art.html" '
+            'aria-label="Minh họa ba loài chim của Allison Horst">'
+            f'<img src="data:image/png;base64,{art}" alt=""><small>@allison_horst</small></a></div>')
+        jump = Result(value='<button type="button" class="pg-jump" data-target="predict">Đến nút dự đoán</button>'
+                            '<button type="button" class="pg-jump" data-target="result">Đọc kết quả dự đoán</button>')
+        self.form = widgets.VBox([
+            specimen, self.preset,
             widgets.Box([self.controls["species"], self.controls["sex"]]).add_class("pg-pair"),
             *[self.controls[f] for f in self.numeric_features],
-            widgets.HTML('<h3 class="pg-settings">Cấu hình dự đoán</h3>'),
-            self.protocol, widgets.Box([self.model_picker, self.level]).add_class("pg-pair").add_class("pg-model-pair"),
-            self.compare, self.predict_button, jump.add_class("pg-jump-host"),
+            jump.add_class("pg-jump-host"),
         ]).add_class("pg-form")
+        settings = widgets.Box([self.protocol, self.model_picker, self.level,
+                                self.predict_button, self.reset_button]).add_class("pg-command")
         self.figure_title = widgets.HTML("<h3>Xu hướng khối lượng</h3>")
         self.figure_panel = widgets.VBox([
-            self.view, self.figure_title, self.feature_picker, self.chart, self.caption,
+            self.figure_title, self.view, self.reliability, self.feature_picker, self.compare, self.chart, self.caption,
         ]).add_class("pg-view")
-        self.panel = widgets.VBox([header, self.result, widgets.Box([form, self.figure_panel]).add_class("pg-layout")],
+        self.body = widgets.Box([self.form, self.figure_panel]).add_class("pg-layout")
+        self.glossary = Result(value=(ASSETS / "glossary.html").read_text(encoding="utf-8"))
+        self.panel = widgets.VBox([header, self.section, settings, self.result, self.body, self.glossary],
                                   layout=widgets.Layout(width="100%", max_width="1140px", margin="0"))
         self.panel.add_class("penguin-panel")
         self.protocol.observe(self._change_protocol, names="value")
@@ -146,7 +179,50 @@ class PredictionApp:
             control.observe(self._input_changed, names="value")
         for control in (self.view, self.compare, self.feature_picker):
             control.observe(self._change_view, names="value")
+        self.section.observe(self._change_view, names="value")
+        self.reliability.observe(self._change_view, names="value")
+        self.preset.observe(self._apply_preset, names="value")
+        self.reset_button.on_click(self._reset)
         self.predict_button.on_click(self._render)
+        self._change_view()
+
+    def _fill(self, values):
+        for key, control in self.controls.items():
+            control.value = values[key]
+            if key in self.numeric_features:
+                control.valid = True
+                control.reset_count += 1
+
+    def _apply_preset(self, change):
+        if self._batch or change.new not in self.presets:
+            return
+        self._batch = True
+        try:
+            self._fill(self.train.loc[self.presets[change.new], FEATURES])
+        finally:
+            self._batch = False
+        self._input_changed()
+
+    def _reset(self, _button=None):
+        self._batch = True
+        try:
+            self.protocol.value = self.protocol.options[0][1]
+            self.model_picker.index = 0 if self.model_picker.options else None
+            self.level.value = .95
+            self.section.value = "predict"
+            self.view.value = "trend"
+            self.reliability.value = "individual"
+            self.feature_picker.index = 0
+            self.compare.value = len(self.models) > 1 and not self.calibrated
+            self.preset.index = 0
+            self._fill(self.defaults)
+        finally:
+            self._batch = False
+        self._input_changed()
+        self._change_view()
+        self._render()
+        for output in (self.result, self.caption, self.glossary):
+            output.reset_count += 1
 
     def _change_protocol(self, _change=None):
         conformal = self.protocol.value == "conformal"
@@ -157,6 +233,7 @@ class PredictionApp:
         self.level.disabled = not conformal
         self.compare.disabled = len(names) < 2
         self._input_changed()
+        self._change_view()
 
     def _show_notice(self, text):
         self.result.value = (f'<section class="pg-notice" lang="vi"><h3>Khối lượng dự đoán</h3>'
@@ -164,11 +241,17 @@ class PredictionApp:
         self.result.announcement = text
 
     def _input_changed(self, _change=None):
+        if self._batch:
+            return
+        if _change and _change.owner in self.controls.values() and self.preset.index:
+            self.preset.index = 0
         self._revision += 1
         self._rendering = False
         self.predict_button.description = "Dự đoán"
         self.rendered = False
-        self.chart.value = b""
+        with self.chart.hold_sync():
+            self.chart.value = b""
+            self.chart.compact = b""
         self.caption.value = '<p class="pg-plot-placeholder" lang="vi">Biểu đồ chờ kết quả dự đoán.</p>'
         invalid = any(not self.controls[key].valid for key in self.numeric_features)
         self.predict_button.disabled = invalid or not self.models
@@ -180,14 +263,71 @@ class PredictionApp:
             self._show_notice("Bấm Dự đoán để cập nhật kết quả và biểu đồ.")
 
     def _change_view(self, _change=None):
-        titles = {"trend": "Xu hướng khối lượng", "hist": "Phần dư trên tập kiểm tra", "box": "Sai số theo loài"}
-        self.figure_title.value = f"<h3>{titles[self.view.value]}</h3>"
-        self.feature_picker.layout.display = "" if self.view.value == "trend" else "none"
+        if self._batch:
+            return
+        section = self.section.value
+        predict = section == "predict"
+        trend = predict and self.view.value == "trend"
+        conformal = self.protocol.value == "conformal"
+        titles = {"trend": "Xu hướng khối lượng", "hist": "Phân bố phần dư", "box": "Sai số theo loài",
+                  "actual": "Thực tế và dự đoán"}
+        title = {"predict": titles[self.view.value],
+                 "compare": "Khoảng dự đoán theo mô hình" if conformal else "Chênh lệch MAE so với OLS",
+                 "verify": "Bao phủ và độ rộng" if self.reliability.value == "width" else "Khoảng dự đoán trên tập test",
+                 "method": "Từ sai số hiệu chỉnh đến khoảng cá thể"}[section]
+        self.figure_title.value = f'<h3 tabindex="-1">{title}</h3>'
+        self.form.layout.display = "" if predict else "none"
+        if predict:
+            self.body.remove_class("pg-analysis")
+        else:
+            self.body.add_class("pg-analysis")
+        self.view.layout.display = "" if predict else "none"
+        self.reliability.layout.display = "" if section == "verify" and conformal else "none"
+        self.feature_picker.layout.display = "" if trend else "none"
+        self.compare.layout.display = "" if trend else "none"
         if self.rendered or self._rendering:
             self._render()
 
+    def _analysis_plot(self, point, name):
+        section = self.section.value
+        mode = self.protocol.value
+        level = self.level.value
+        if section == "compare" and mode == "conformal":
+            rows = evidence.comparison_rows(self.calibrated, self.performance, point, level)
+            return evidence.interval_plot(rows, level)
+        # Individual intervals depend on the specimen. Population charts have a finite set of inputs.
+        if section == "predict":
+            key = (section, mode, name, self.view.value)
+        elif section == "compare":
+            key = (section, mode)
+        else:
+            key = (section, mode, name, level, self.reliability.value)
+        if key not in self._figure_cache:
+            if section == "compare":
+                if self.benchmark is None:
+                    return (b"", b""), "Benchmark", "Bảng đối chiếu CV và bootstrap chưa có cho tập dữ liệu này."
+                plot = evidence.benchmark_plot(self.benchmark, self.models, len(self.test))
+            elif section in ("verify", "method") and mode != "conformal":
+                return (b"", b""), "Hướng dẫn", "Chọn chế độ Dự đoán cá thể · conformal và bấm Dự đoán để xem kết quả hiệu chỉnh."
+            elif section == "method":
+                plot = evidence.method_plot(self.calibration_scores[name], name, level, len(self.train), len(self.test))
+            elif section == "verify" and self.reliability.value == "width":
+                plot = evidence.coverage_plot(self.calibrated, self.performance, name)
+            elif section == "verify":
+                radius = self.calibrated[name].radii[level]
+                rows = evidence.test_rows(self.test, self.predictions[mode, name], radius)
+                plot = evidence.heldout_plot(rows, name, level)
+            elif self.view.value == "actual":
+                rows = evidence.test_rows(self.test, self.predictions[mode, name])
+                info = self.performance[name, level] if mode == "conformal" else self.performance["full", name]
+                plot = evidence.actual_plot(rows, name, info, mode if mode == "conformal" else "benchmark")
+            else:
+                plot = error_plot(self.view.value, name, self.residuals[mode, name], self.test["species"])
+            self._figure_cache[key] = plot
+        return self._figure_cache[key]
+
     def _render(self, _button=None):
-        if not self.models or any(not self.controls[k].valid for k in self.numeric_features):
+        if self._batch or not self.models or any(not self.controls[k].valid for k in self.numeric_features):
             return
         self._revision += 1
         revision = self._revision
@@ -207,7 +347,7 @@ class PredictionApp:
             support = self.proper if conformal else self.train
             predictors = ({n: fitted.predictor for n, fitted in self.calibrated.items()}
                           if conformal else self.models)
-            names = [name] + [n for n in predictors if self.compare.value and n != name]
+            names = [name] + [n for n in predictors if self.compare.value and self.section.value == "predict" and self.view.value == "trend" and n != name]
             estimate = {n: predictors[n].predict(point)[0] for n in names}
             if not np.isfinite(list(estimate.values())).all():
                 raise ValueError("Non-finite prediction.")
@@ -219,7 +359,7 @@ class PredictionApp:
                 radius = self.calibrated[name].radii[level]
                 low_high = (estimate[name] - radius, estimate[name] + radius)
                 info = self.performance[name, level]
-            if self.view.value == "trend":
+            if self.section.value == "predict" and self.view.value == "trend":
                 feature = self.feature_picker.value
                 control = self.controls[feature]
                 values = ([v for _, v in control.options] if feature in CATEGORICAL
@@ -231,14 +371,14 @@ class PredictionApp:
                 image, alt, caption = trend_plot(name, feature, self.labels, point, values, estimate,
                                                   trends, support, radius)
             else:
-                image, alt, caption = error_plot(self.view.value, name,
-                                                 self.residuals[self.protocol.value, name], self.test["species"])
-            result = self._result_html(name, point, estimate, support, info, low_high)
+                image, alt, caption = self._analysis_plot(point, name)
+            result, interval_text = self._result_html(name, point, estimate, support, info, low_high)
             # Jupyter may deliver another widget event while Matplotlib draws.
             if revision != self._revision:
                 return
             self.result.value = result
-            self.result.announcement = f"{name}, khối lượng dự đoán {number(estimate[name])} g. {alt}"
+            spoken = f"{name}, khối lượng dự đoán {number(estimate[name])} g."
+            self.result.announcement = f"{spoken} {interval_text} {alt}".strip()
             self.caption.value = f'<div lang="vi" class="pg-caption">{caption}</div>'
             with self.chart.hold_sync():
                 self.chart.description = alt
@@ -276,10 +416,12 @@ class PredictionApp:
         safe_name = escape(name)
         prediction = number(estimate[name])
         band = ""
+        interval_text = ""
         detail = ""
         evidence = ""
         if bounds is not None:
             level = self.level.value
+            interval_text = f"Khoảng cá thể {level:.0%} từ {number(bounds[0])} đến {number(bounds[1])} g."
             band = self._interval_html(f"Khoảng cá thể {level:.0%}", bounds, estimate[name])
             evidence = (f'<div><dt>Bao phủ thực nghiệm</dt><dd>{number(100 * info["coverage"])}%'
                         f'<small>{info["n"] - info["outside"]}/{info["n"]} cá thể test nằm trong khoảng</small></dd></div>')
@@ -291,6 +433,7 @@ class PredictionApp:
             detail = f'Chế độ benchmark sử dụng toàn bộ {len(support)} mẫu train.'
             if name == "OLS":
                 row = ols_prediction_intervals(self.models[name], self.ols_inference, point).iloc[0]
+                interval_text = f"PI 95% cho cá thể từ {number(row.obs_ci_lower)} đến {number(row.obs_ci_upper)} g."
                 band = self._interval_html("PI 95% cho cá thể", (row.obs_ci_lower, row.obs_ci_upper), estimate[name])
                 evidence = (f'<div><dt>CI 95% cho trung bình</dt><dd>{number(row.mean_ci_lower)} '
                             f'đến {number(row.mean_ci_upper)} g</dd></div>')
@@ -317,4 +460,4 @@ class PredictionApp:
                    if not group[k].min() <= point[k].iloc[0] <= group[k].max()]
         if outside:
             result += f'<p class="pg-warning">Ngoài khoảng train của loài {escape(species)} · {", ".join(outside)}.</p>'
-        return result
+        return result, interval_text
