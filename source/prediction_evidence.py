@@ -116,7 +116,7 @@ def coverage_plot(names, performance, selected):
             data.append([name, f"{level:.0%}", number(100*s["coverage"])+"%", number(s["width_g"]),
                          s["outside"], s["n"]])
     ax.set(xlabel="Độ rộng khoảng (g)", ylabel="Bao phủ thực nghiệm (%)")
-    legend(ax, 4)
+    legend(ax, 3)
     low, high = [performance[selected, level] for level in LEVELS]
     alt = (f"{selected}: từ 90% lên 95%, khoảng rộng thêm {number(high['width_g']-low['width_g'])} g. "
            f"Số cá thể ngoài khoảng lần lượt là {low['outside']} và {high['outside']} trên {high['n']} mẫu.")

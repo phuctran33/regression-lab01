@@ -87,6 +87,7 @@ if checked_app is not None and hasattr(checked_app, "predict_button"):
         expected = models[name].predict(pd.DataFrame([inputs]))[0]
         assert number(expected) in checked_app.result.value
     if getattr(checked_app, "calibrated", {}):
+        assert set(checked_app.calibrated) == set(models)
         checked_app.protocol.value = "conformal"
         for name, fitted in checked_app.calibrated.items():
             checked_app.model_picker.value = name
@@ -201,16 +202,15 @@ def run_checks(output_dir=None, *, notebook=False):
         def notebook_check():
             names, path = execute_notebook()
             state['models'] = names or []
-            return f'Executed notebook and M1 prediction widget; output={path}'
+            return f'Executed notebook and checked prediction widgets for {", ".join(names)}; output={path}'
 
-        check('notebook_and_m1_app', 'Hưng / Khiêm', notebook_check)
+        check('notebook_and_prediction_app', 'Nhóm', notebook_check)
 
         def full_app():
             names = set(state.get('models', []))
             missing = {'OLS', 'M1', 'M2', 'M3', 'M4'} - names
             if missing:
                 raise ValueError('Missing app choices: ' + ', '.join(sorted(missing)))
-            # A model name backed by a placeholder does not count as completion.
             for name in ('m1', 'm2', 'm3', 'm4'):
                 if getattr(importlib.import_module('source.models.' + name), 'ESTIMATOR', None) is None:
                     raise ValueError(f'{name.upper()} choice still uses a placeholder.')

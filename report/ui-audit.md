@@ -1,4 +1,6 @@
-# Palmer Penguins · nghiệm thu ứng dụng
+# Palmer Penguins · nghiệm thu thiết kế với bốn mô hình
+
+Ảnh, thời gian và điểm số trong tài liệu này được ghi ở bản thiết kế `ca118f9`. Bản tích hợp nhóm đã thêm M4 Huber vào benchmark, conformal và giao diện. [Nghiệm thu năm mô hình](handoff.md)
 
 Mục 5 của notebook và bản trình diễn localhost cho cùng kết quả. Với OLS mặc định, dự đoán là **3.571,7 g**, khoảng cá thể 95% từ **2.935,5 đến 4.208,0 g**. Có **67/69** khối lượng thật trong dải ở tập test. Có thể chọn một ID, đối chiếu với bảng rồi tải kết quả của cá thể đang khảo sát. [Hướng dẫn chạy](../README.md#trình-diễn-độc-lập) · [Kịch bản hai phút](section-3-4-application.md#demo-hai-phút) · [Số đo và kết quả kiểm tra máy đọc được](ui-checks.json)
 

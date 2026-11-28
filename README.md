@@ -1,6 +1,6 @@
 # Lab 01 – Dự đoán khối lượng chim cánh cụt
 
-Đồ án hồi quy tuyến tính với bộ dữ liệu Palmer Penguins. Biến đích là `body_mass_g` (g). Bản tích hợp có OLS, M1 Ridge, M2 spline cơ sở và M3 spline làm mượt. EDA tuần 2 và M4 còn chờ Phúc. Notebook dùng chung bộ đầu vào và tập kiểm tra để so sánh.
+Đồ án hồi quy tuyến tính với bộ dữ liệu Palmer Penguins. Biến đích là `body_mass_g` (g). Bản tích hợp có OLS, M1 Ridge, M2 spline cơ sở, M3 spline làm mượt và M4 Huber. EDA thống kê phân tích tương quan, khác biệt giữa nhóm và hình dạng quan hệ trên train. Notebook dùng chung bộ đầu vào và tập kiểm tra để so sánh.
 
 | Tệp | Nội dung |
 | --- | --- |
@@ -33,7 +33,7 @@ Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và ch�
 | Khu vực | Có thể đọc gì? |
 | --- | --- |
 | Dự đoán cá thể | Khối lượng và khoảng dự đoán, xu hướng có điều kiện, phần dư, sai số theo loài và thực tế so với dự đoán. |
-| So sánh mô hình | Bốn khoảng conformal trên cùng thước gram. Đổi sang Benchmark để xem ΔMAE, CI bootstrap, chỉ số test và CV. |
+| So sánh mô hình | Năm khoảng conformal trên cùng thước gram. Đổi sang Benchmark để xem ΔMAE, CI bootstrap, chỉ số test và CV. |
 | Kiểm chứng khoảng | Cận, dự đoán và khối lượng thật của 69 cá thể. So sánh độ bao phủ và độ rộng ở hai mức 90% và 95%. |
 | Phương pháp | Bảy bước tách tập, fit, hiệu chỉnh và kiểm chứng. Mở bảng để đọc 55 sai số đã xếp hạng. |
 
@@ -58,7 +58,7 @@ Chọn một đường đo trên sơ đồ để sửa số đo tương ứng. T
 | TV1 · Tiết Trọng Khiêm | [M1](source/models/m1.py) | Ridge Regression |
 | TV2 · Nguyễn Khang Hy | [M2](source/models/m2.py) | Cubic Spline Basis Regression |
 | TV3 · Nguyễn Đức Hưng | [M3](source/models/m3.py) | Additive Natural Cubic Smoothing Spline |
-| TV4 · Trần Thiên Phúc | [M4](source/models/m4.py) | Huber Regression (dự kiến) |
+| TV4 · Trần Thiên Phúc | [M4](source/models/m4.py) | Huber Regression |
 
 TV4 phụ trách EDA từ 19/11 và bàn giao kết quả để cả nhóm chốt bộ biến đầu vào ngày 20/11.
 
@@ -77,7 +77,7 @@ Nếu dùng Git, mỗi người làm trên nhánh riêng và đưa tệp mô hì
 ## Hoàn thiện bài nhóm
 
 1. Xác nhận mã nhóm và thông tin thành viên cho bản nộp.
-2. Ghép EDA tuần 2 và M4 của Phúc, đối chiếu với kết quả bốn predictor trong báo cáo tích hợp.
+2. Đối chiếu kết quả của năm mô hình và duyệt [EDA thống kê](report/eda-week1.md) cùng [phân tích M4](report/huber-m4-week2.md).
 3. Chạy lại toàn bộ notebook, đưa bảng chỉ số và biểu đồ vào báo cáo. Liên hệ nhận xét với hệ số, sai số và dữ liệu quan sát được.
 4. Quay video demo giao diện nhập dữ liệu, dự đoán và xem biểu đồ. Xuất báo cáo hoàn chỉnh sang PDF (đề gợi ý 10–20 trang).
 5. Cử một đại diện nộp `Group [Group-ID].zip`, thay `[Group-ID]` bằng mã nhóm. Gói nộp gồm thư mục `data/`, thư mục `source/`, `requirements.txt`, video demo và báo cáo PDF. Kiểm tra notebook chạy được sau khi giải nén.

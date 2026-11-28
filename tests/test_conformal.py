@@ -46,7 +46,7 @@ class ConformalTests(unittest.TestCase):
             return original(pipeline, X, y, **kwargs)
 
         with patch.object(Pipeline, "fit", track):
-            models = fit_calibrated(proper, cal, ["OLS", "M1", "M2", "M3"])
+            models = fit_calibrated(proper, cal, ["OLS", "M1", "M2", "M3", "M4"])
         self.assertEqual(fit_sizes, {174, 175, 218})
         for model in models.values():
             scores = np.sort(abs(cal[TARGET] - model.predictor.predict(cal[FEATURES])))

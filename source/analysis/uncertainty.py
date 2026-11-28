@@ -6,20 +6,23 @@ import numpy as np
 from sklearn.model_selection import GridSearchCV, train_test_split
 
 from ..modeling import FEATURES, TARGET
-from ..models import m1, m2, m3, ols
+from ..models import m1, m2, m3, m4, ols
 
-MODULES = {module.NAME: module for module in (ols, m1, m2, m3)}
+MODULES = {module.NAME: module for module in (ols, m1, m2, m3, m4)}
+GRIDS = {
+    "M2": {"preprocess__numeric__scaler__n_knots": m2.KNOT_GRID},
+    "M3": {"regression__lam": m3.LAMBDA_CANDIDATES},
+    "M4": m4.GRID,
+}
 LEVELS = (0.90, 0.95)
 
 
 def fitting_procedure(name):
     """Unfitted selection procedure; all inner fits include preprocessing."""
     model = MODULES[name].build_model()
-    if name in ("OLS", "M1"):
+    if name not in GRIDS:
         return model
-    grid = ({"preprocess__numeric__scaler__n_knots": m2.KNOT_GRID} if name == "M2"
-            else {"regression__lam": m3.LAMBDA_CANDIDATES})
-    return GridSearchCV(model, grid, cv=m1.cv_splitter(), scoring="neg_mean_absolute_error",
+    return GridSearchCV(model, GRIDS[name], cv=m1.cv_splitter(), scoring="neg_mean_absolute_error",
                         error_score="raise")
 
 

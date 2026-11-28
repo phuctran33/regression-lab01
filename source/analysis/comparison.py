@@ -1,4 +1,4 @@
-"""Reproduce the shared four-model benchmark, nested CV and split-conformal evaluation."""
+"""Reproduce the shared benchmark, nested CV and split-conformal evaluation."""
 import json
 from argparse import ArgumentParser
 from pathlib import Path
@@ -18,7 +18,10 @@ from .uncertainty import (
 
 
 def selected_parameter(estimator):
-    return next(iter(estimator.best_params_.values())) if hasattr(estimator, "best_params_") else None
+    params = getattr(estimator, "best_params_", {})
+    if len(params) > 1:
+        return {key.rsplit("__", 1)[-1]: value for key, value in params.items()}
+    return next(iter(params.values()), None)
 
 
 def conformal_test(calibrated, test):

@@ -158,6 +158,6 @@ class PredictionEvidenceTests(TestCase):
         app.section.value = "compare"
         app.protocol.value = "full"
         app.predict_button.click()
-        self.assertIn("3/3", app.chart.description)
+        self.assertIn("4/4", app.chart.description)
         self.assertIn("Nested CV",app.caption.value)
         self.assertIsNone(ev.verified_benchmark(self.test.iloc[::-1], {"OLS":app.predictions["full","OLS"]}))

@@ -1,10 +1,10 @@
 ## 3.4 Ứng dụng dự đoán
 
-Mở JupyterLab bằng `python -m jupyterlab source/lab01.ipynb`, chọn kernel của môi trường đã cài thư viện rồi chạy toàn bộ notebook. Ở mục 5, chọn mô hình, nhập chiều dài cánh bơi, chiều dài và độ sâu mỏ bằng mm, chọn loài và giới tính, sau đó bấm **Dự đoán**. Kết quả chính là `body_mass_g` theo gram. Nhánh bàn giao có OLS, M1 Ridge, M2 Cubic Spline Basis và M3 Natural Cubic Smoothing Spline. M4 Huber được ghi là **Chưa sẵn sàng** ở bảng huấn luyện. Khi M4 có estimator, notebook có thể thêm vào benchmark. Chế độ conformal cần procedure chọn cấu hình của M4 và kiểm chứng coverage riêng. [Hướng dẫn notebook](../README.md#chạy-notebook) · [Mở notebook](../source/lab01.ipynb)
+Mở JupyterLab bằng `python -m jupyterlab source/lab01.ipynb`, chọn kernel của môi trường đã cài thư viện rồi chạy toàn bộ notebook. Ở mục 5, chọn mô hình, nhập chiều dài cánh bơi, chiều dài và độ sâu mỏ bằng mm, chọn loài và giới tính, sau đó bấm **Dự đoán**. Kết quả chính là `body_mass_g` theo gram. Hai chế độ đều có OLS, M1 Ridge, M2 Cubic Spline Basis, M3 Natural Cubic Smoothing Spline và M4 Huber. Với M4, benchmark dùng cấu hình chọn trên toàn bộ train. Conformal chọn lại epsilon và alpha trên proper train rồi tính cận từ 55 mẫu hiệu chỉnh riêng. [Hướng dẫn notebook](../README.md#chạy-notebook) · [Mở notebook](../source/lab01.ipynb)
 
 Trên laptop, đặt số đo ở cột trái và đọc kết quả ở cột phải. Trên điện thoại, nút **Tính từ số đo** nằm ngay cuối biểu mẫu. Trên thước gram, đoạn sáng nối hai cận và hình thoi đánh dấu dự đoán điểm. Thước lấy hai mốc ngoài từ miền khối lượng train làm tròn ra bậc 500 g và mở rộng nếu cận vượt miền. Các trang phân tích thu kết quả thành một dòng ghi loài, giới tính, mô hình, chế độ và dự đoán. **Chỉnh số đo** đưa người xem trở về biểu mẫu.
 
-Chế độ mặc định dùng split conformal. Khi mở giao diện, bốn pipeline được chọn cấu hình và fit trên 218 cá thể rồi hiệu chỉnh trên 55 cá thể. Ở nominal 95%, 67/69 mẫu test nằm trong khoảng OLS, độ rộng 1.273 g. Chuyển xuống 90% cho 66/69 mẫu và khoảng rộng 1.165 g. Cận và MAE thuộc cùng predictor với dự đoán. Các mức bao phủ mô tả hiệu năng trên quần thể trao đổi được, độ rộng cố định theo mô hình và mức. [Coverage và độ rộng theo mô hình](integration.md)
+Chế độ mặc định dùng split conformal. Khi mở giao diện, năm pipeline được chọn cấu hình và fit trên 218 cá thể rồi hiệu chỉnh trên 55 cá thể. Ở nominal 95%, 67/69 mẫu test nằm trong khoảng OLS, độ rộng 1.273 g. Chuyển xuống 90% cho 66/69 mẫu và khoảng rộng 1.165 g. Cận và MAE thuộc cùng predictor với dự đoán. Các mức bao phủ mô tả hiệu năng trên quần thể trao đổi được, độ rộng cố định theo mô hình và mức. [Coverage và độ rộng theo mô hình](integration.md)
 
 Trong chế độ **Benchmark**, giao diện gọi `predict` trên pipeline đã fit ở mục 3 của notebook. Một dự đoán dùng hàng đầu vào hiện tại. Biểu đồ tạo một dãy hàng chỉ thay biến đang chọn và giữ nguyên bốn đầu vào còn lại. Với biến phân loại, mô hình thử lần lượt các mức hợp lệ. Bật **So sánh các mô hình sẵn sàng** để hiện dự đoán và đường của các mô hình trên cùng đầu vào. Khi OLS và M3 cùng xuất hiện, biểu đồ số đo có thêm ô chênh lệch M3 − OLS theo gram. Các điểm nền là quan sát train với nhiều tổ hợp đầu vào. Dấu sao đánh dấu giá trị đang nhập và dự đoán của mô hình chính. Mục 4 có bảng MAE, MSE, RMSE và R² trên cùng tập test. [Mã giao diện](../source/prediction_app.py)
 
@@ -31,10 +31,10 @@ Chạy `python -m source.present` từ thư mục dự án. Mở địa chỉ lo
 | Thời gian | Thao tác trực tiếp | Điều cần cho người xem thấy |
 | --- | --- | --- |
 | 0:00–0:20 | Chọn **Gentoo · gần trung vị**, chọn đường chiều dài mỏ trên hình rồi bấm **Dự đoán**. | Năm đầu vào thuộc cùng một cá thể train. Đọc khối lượng, hai cận theo gram, số cá thể test trong khoảng và MAE. |
-| 0:20–0:40 | Mở **So sánh mô hình**, giữ mức 95%. | Bốn ký hiệu dùng một thước gram cho cùng cá thể. Độ rộng và mức chênh dự đoán điểm trả lời hai câu hỏi khác nhau. |
+| 0:20–0:40 | Mở **So sánh mô hình**, giữ mức 95%. | Năm ký hiệu dùng một thước gram cho cùng cá thể. Độ rộng và mức chênh dự đoán điểm trả lời hai câu hỏi khác nhau. |
 | 0:40–1:05 | Chọn M2, 90%, bấm **Dự đoán**, mở **Kiểm chứng khoảng**. Chạm dấu × hoặc chọn ID trong danh sách. Xem lại ở 95%. | Đối chiếu khối lượng thật với hai cận. Từ 7 xuống 1 cá thể ngoài khoảng trên cùng 69 ID khi khoảng rộng thêm 343,9 g. |
 | 1:05–1:25 | Mở **Phương pháp**. Chuyển từ 95% về 90% và bấm **Dự đoán**. | Hạng được chọn đổi từ 54 về 51 trong 55 sai số hiệu chỉnh. Predictor fit trên 218 mẫu. Một tỉ lệ bao phủ trên test mô tả kết quả của cả tập. |
-| 1:25–1:45 | Mở **So sánh mô hình**, chọn Benchmark và bấm **Dự đoán**. | Đường đứng là ΔMAE bằng 0. Cả ba CI bootstrap ghép cặp đi qua đường này. Các chênh lệch MAE quan sát được chỉ khoảng vài gram. |
+| 1:25–1:45 | Mở **So sánh mô hình**, chọn Benchmark và bấm **Dự đoán**. | Đường đứng là ΔMAE bằng 0. Cả bốn CI bootstrap ghép cặp đi qua đường này. Các chênh lệch MAE quan sát được chỉ khoảng vài gram. |
 | 1:45–2:00 | Trở về **Dự đoán cá thể**, mở **Thực tế và dự đoán** hoặc **Sai số theo loài**. Tải CSV rồi chọn **Khôi phục mặc định**. | Điểm xa đường chéo giúp giải thích vì sao MAE trung bình có thể che một sai số cá thể lớn. Đối chiếu dự đoán xuất ra với màn hình. |
 
 Ba preset theo loài là hàng đầy đủ gần trung vị nhất theo ba số đo đã chuẩn hóa trong loài. Hai preset còn lại lấy cá thể nhẹ nhất và cánh bơi dài nhất trong các hàng train đầy đủ. Panel **Phương pháp** có đồ thị hạng sai số, quy trình bảy bước và giới hạn trao đổi được. Phần tra cứu ở cuối mỗi màn hình giải nghĩa 18 thuật ngữ. [Ảnh mọi khu vực và bảng nghiệm thu](ui-audit.md)
@@ -53,4 +53,4 @@ Chọn **Benchmark · toàn bộ train** và bật **So sánh các mô hình s�
 
 ### Bàn giao
 
-Các mô hình sẵn sàng đã được thử qua chung giao diện này. Bản demo của nhóm có thể thêm Huber sau khi Phúc bàn giao estimator, cùng nhận xét về kết quả dự đoán của từng chủ mô hình. Phần đối chiếu hiệu năng OLS/M3 và liên kết đến các bàn giao hiện có nằm ở mục 3.3. [Đánh giá và diễn giải](section-3-3-evaluation.md)
+Cả năm mô hình dùng chung giao diện. Báo cáo Huber giải thích điểm ảnh hưởng và độ nhạy của M4 khi fit lại. [Báo cáo M4](huber-m4-week2.md) Phần đối chiếu hiệu năng OLS/M3 và liên kết đến các bàn giao hiện có nằm ở mục 3.3. [Đánh giá và diễn giải](section-3-3-evaluation.md)

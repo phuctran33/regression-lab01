@@ -177,7 +177,7 @@ def exercise(page, url, axe_path, evidence_dir=None, presentation=False, touch=F
         expect(app.locator(".pg-point")).to_contain_text(pick("Loài").input_value())
     app.get_by_role("button",name="Khôi phục mặc định").click()
     expect(app.locator(".pg-mass")).to_have_text("3.571,7 g")
-    for i in range(1,4):
+    for i in range(1,5):
         select("Mô hình",i)
         expect(result).to_contain_text(f"M{i} ·")
     for slider in app.get_by_role("slider").all():
@@ -210,7 +210,7 @@ def exercise(page, url, axe_path, evidence_dir=None, presentation=False, touch=F
     expect(result).to_contain_text("3.571,7 g")
 
     show(nav,"So sánh mô hình","Conformal 95%")
-    expect(rows()).to_have_count(4)
+    expect(rows()).to_have_count(5)
     expect(rows().first).to_contain_text("2.935,5")
     expect(rows().first).to_contain_text("1.272,6")
     audit("intervals")
@@ -273,7 +273,7 @@ def exercise(page, url, axe_path, evidence_dir=None, presentation=False, touch=F
     help_box.locator("summary").press("Enter")
     checks=app.get_by_role("group",name="Kiểm chứng khoảng",exact=True)
     show(checks,"Bao phủ và độ rộng","M2: từ 90% lên 95%")
-    expect(rows()).to_have_count(8)
+    expect(rows()).to_have_count(10)
     expect(caption).to_contain_text("7 và 1")
     audit("coverage-width")
     shot("coverage-width")
@@ -291,11 +291,13 @@ def exercise(page, url, axe_path, evidence_dir=None, presentation=False, touch=F
     shot("method")
     show(nav,"So sánh mô hình","Conformal 95%")
     select("Chế độ",1)
-    expect(plot).to_have_attribute("alt",re.compile("3/3 khoảng bootstrap"))
-    expect(rows()).to_have_count(4)
+    expect(plot).to_have_attribute("alt",re.compile("4/4 khoảng bootstrap"))
+    expect(rows()).to_have_count(5)
     expect(rows().first).to_contain_text("256,7")
     audit("benchmark")
     shot("benchmark")
+    select("Mô hình",4)
+    expect(result).to_contain_text("M4 ·")
     for i in (0,1,2,3):
         select("Mô hình",i)
         if i==0:
@@ -391,7 +393,7 @@ def exercise(page, url, axe_path, evidence_dir=None, presentation=False, touch=F
     expect(result).to_contain_text("3.571,7 g")
     assert not page_errors, page_errors
     assert not external, external
-    print("All application views, four models, two protocols, presets, reset and keyboard flows passed.")
+    print("All application views, five models, two protocols, presets, reset and keyboard flows passed.")
 
 
 
