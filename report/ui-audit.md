@@ -1,91 +1,133 @@
-# Nghiệm thu ứng dụng Palmer Penguins
+# Palmer Penguins · nghiệm thu ứng dụng
 
-Ở ví dụ mặc định, OLS dự đoán **3.571,7 g**. Hai cận của khoảng cá thể 95% là **2.935,5 g và 4.208,0 g**. Người xem có thể mở **Kiểm chứng khoảng** và tự kiểm đếm 67/69 khối lượng thật nằm trong dải. Con số 95% là mục tiêu của quy trình hiệu chỉnh, còn 67/69 là kết quả quan sát trên tập test.
+Mục 5 của notebook và bản trình diễn localhost cho cùng kết quả. Với OLS mặc định, dự đoán là **3.571,7 g**, khoảng cá thể 95% từ **2.935,5 đến 4.208,0 g**. Có **67/69** khối lượng thật trong dải ở tập test. Có thể chọn một ID, đối chiếu với bảng rồi tải kết quả của cá thể đang khảo sát. [Hướng dẫn chạy](../README.md#trình-diễn-độc-lập) · [Kịch bản hai phút](section-3-4-application.md#demo-hai-phút) · [Số đo và kết quả kiểm tra máy đọc được](ui-checks.json)
 
-| Trước, commit `9936072` | Sau, cùng đầu vào và mức bao phủ |
+| Trước · `7497080` | Sau · cùng dữ liệu, mô hình và mức bao phủ |
 | --- | --- |
-| ![Giao diện trước khi mở rộng các khu vực phân tích](figures/prediction-before.png) | ![Giao diện sau, ví dụ OLS và thước khoảng dự đoán](figures/prediction-dashboard.png) |
+| ![Widget phiên bản trước ở đầu vào OLS mặc định](figures/prediction-before.png) | ![Phiên bản bàn giao với biểu mẫu, khoảng dự đoán và sơ đồ đo](figures/prediction-dashboard.png) |
 
-[Khung JupyterLab 1440 × 900](figures/application/viewport-1440.png) · [1366 × 768](figures/application/viewport-1366.png) · [Widget ở cửa sổ 390 px](figures/prediction-narrow.png) · [Audit của bản trước](https://github.com/phuctran33/regression-lab01/blob/9936072d305b97bc8d794da7fbcb92485bf0a647/report/ui-audit.md)
+Ở bản trước, hình ba loài tĩnh chiếm ít chỗ nhưng chưa cho thấy cách lấy số đo. Dải kết quả đầy đủ lặp lại ở các trang phân tích. Trên điện thoại, tên mô hình và nút khôi phục phải chia sẻ những ô hẹp. Khi đọc một dấu × trên tập test, người xem phải dò thủ công từ trục sang bảng. Bản mới ghép biểu mẫu với hai hình chiếu của chim trên laptop, dành một dòng cho ngữ cảnh ở các trang phân tích và nối từng dấu với đúng hàng dữ liệu. Bản trình diễn mở trực tiếp vào ứng dụng. [Audit tại mốc trước](https://github.com/phuctran33/regression-lab01/blob/7497080751f42cc431cc39c0605c72564823a32c/report/ui-audit.md) · [Hình laptop](figures/application/viewport-1366.png) · [Hình điện thoại](figures/prediction-narrow.png)
 
-## Nghiệm thu từng chức năng
+## Nghiệm thu 28 yêu cầu
 
-| Chức năng | Bằng chứng thực chạy | Trạng thái | Giới hạn |
+| Yêu cầu | Bằng chứng | Trạng thái | Giới hạn |
 | --- | --- | --- | --- |
-| 1. Bốn khoảng cho cùng cá thể | [Cùng trục gram](figures/application/interval-comparison.png). Bảng đối chiếu từng điểm, cận, độ rộng, coverage và MAE với bốn predictor ở 90% và 95%. | PASS | Áp dụng cho bốn predictor conformal đã hiệu chỉnh. |
-| 2. Bao phủ và độ rộng | [Tám tổ hợp](figures/application/coverage-width.png). M2 tăng từ 1.016,15 lên 1.360,08 g, số ngoài từ 7 xuống 1. Đường, marker và bảng nhận diện mô hình. | PASS | Mỗi cá thể tương ứng 1/69 trên tập này. |
-| 3. Khoảng trên test | [Dải của M2 ở 90%](figures/application/test-intervals.png). Kiểm lại 69 ID, dự đoán, cận và trạng thái với predictor ở cả hai mức. Dấu × là ngoài, vòng tròn là trong. | PASS | Trục ngang xếp theo dự đoán tăng dần. Đây là tập test nhóm đã từng sử dụng. |
-| 4. Nhận xét động | [Thực tế so với dự đoán](figures/application/actual-predicted.png), [sai số theo loài](figures/prediction-errors.png), [histogram](figures/application/residual-histogram.png). Kiểm ID lệch nhất, MAE, sai lệch có dấu và số quan sát. | PASS | Các diễn giải mô tả dữ liệu và predictor đang chọn. |
-| 5. Cá thể mẫu | [Kiểm thử các preset](../tests/test_prediction_evidence.py). Năm hàng train có thật, đủ đầu vào. Trình duyệt chọn lần lượt từng hàng và dự đoán lại. | PASS | Ba mẫu gần trung vị của loài, hai mẫu ở biên trong các hàng đầy đủ. |
-| 6. Khôi phục mặc định | [Ô số vượt miền](figures/application/input-error.png). Từ ô sai, reset phục hồi 197 mm, OLS, 95%, đầu vào và kết quả gốc. Thử cả bảng đang mở. | PASS | Reset tác động lên widget hiện tại. |
-| 7. Thực tế và dự đoán | [Hai trục gram, đường y = x](figures/application/actual-predicted.png). 69 hàng ở cả hai protocol. M3 benchmark RMSE 307,0 g, M3 conformal MAE 258,2 g. | PASS | Mỗi lần đọc một mô hình. |
-| 8. Quy trình conformal | [Bảy bước và đường sai số](figures/application/method.png). Tái tính hạng 51 và 54 trên 55 sai số. | PASS | Bao phủ biên dựa trên giả định trao đổi được. Bán kính cố định cho mỗi mô hình và mức. |
-| 9. Tra cứu thuật ngữ | 18 mục tiếng Việt, mở và đóng bằng Enter hoặc bấm chạm. [Nội dung](../source/ui/glossary.html) | PASS | Thuật ngữ tập trung ở cuối mỗi vùng. |
-| 10. Phản hồi thao tác | [Runner](../tests/browser_prediction.py) kiểm trạng thái chờ, lỗi, khôi phục và cấu hình giảm chuyển động. Số mới xuất hiện khi phép tính hoàn tất. | PASS | Chuyển nhẹ nền/trạng thái. |
-| 11. Chức năng cũ | [Xu hướng](figures/prediction-dashboard.png), [boxplot](figures/prediction-errors.png), [histogram](figures/application/residual-histogram.png), CI và PI OLS, bốn mô hình, năm đầu vào, so sánh có điều kiện và cảnh báo. | PASS | CI và PI cổ điển chỉ có ở OLS benchmark. |
-| 12. Khả năng tiếp cận | Axe, bàn phím, tên điều khiển, thông báo kết quả, giao diện tối và zoom đã kiểm. Chi tiết bên dưới. | BLOCKED một phần | Chưa xác nhận hành vi đọc thực tế bằng VoiceOver. |
-| 13. Bố cục đáp ứng | [Laptop](figures/application/viewport-1366.png), [điện thoại](figures/prediction-narrow.png). Cửa sổ 320 px chỉ còn 202 px cho widget, kể cả khi mở bảng vẫn cuộn trong vùng bảng. | PASS | Đã thử qua trình duyệt desktop. Chưa đo trên thiết bị cảm ứng thật. |
-| 14. Tính đúng thống kê | [Test theo từng ID](../tests/test_prediction_evidence.py) và [kết quả gốc](comparison.json). JSON thực nghiệm và ba hình evaluation tái tạo khớp từng byte. | PASS | 69 cá thể test thuộc cùng nguồn quan sát. |
-| 15. Trình diễn | [Demo hai phút](section-3-4-application.md#demo-hai-phút). Đã thực hiện chọn mẫu, tính lại, đổi mức, kiểm chứng, so sánh và reset trên trình duyệt. | PASS | Chưa đo thời gian thao tác của người mới. |
-| 16. Tái lập | [Lệnh chạy](handoff.md), [runner trình duyệt](../tests/browser_prediction.py). Notebook chạy từ kernel sạch, 32/32 unit test đạt. | PASS cho bốn mô hình | WebKit/Safari chưa xác minh. Hai kiểm tra cấp nhóm đang chờ M4. |
+| 1. Nhận diện thị giác | Phong cảnh, typography tên loài, giấy màu ngà, số liệu trên nền xanh và trục gram. [Toàn cảnh](figures/prediction-dashboard.png) | PASS về triển khai | Đánh giá thẩm mỹ có tính chủ quan. |
+| 2. Minh họa giải phẫu | Hình toàn thân và mỏ phóng lớn, ba đường đo, hướng đo và đơn vị. [Sơ đồ và nguồn](section-3-4-application.md#sơ-đồ-đo-và-cách-đọc-một-điểm) | PASS | Sơ đồ giáo dục, tỷ lệ minh họa quy ước. |
+| 3. Thay đổi theo loài | Chọn lần lượt ba loài. Tên khoa học, mảng đầu, mắt, cằm và mỏ đổi theo lựa chọn. [Bản vẽ](../source/ui/anatomy.svg) · [Gentoo](figures/application/anatomy.png) | PASS | Ba loài trong dữ liệu Palmer. |
+| 4. Liên kết số đo với hình | Focus, hover, phím Enter và tap. Chọn đường đo trả focus về đúng ô và cập nhật giá trị mm. [Luồng tương tác](../tests/browser_prediction.py) | PASS | Chạm mô phỏng bằng Chromium. |
+| 5. Typography | Khối lượng dùng chữ số tabular và đơn vị nhỏ. Định dạng tiếng Việt áp dụng cho tooltip và cận. [Kết quả](figures/prediction-dashboard.png) | PASS | Font chữ điều khiển phụ thuộc hệ điều hành. |
+| 6. Bố cục và khoảng cách | Số đo cạnh nút tính, kết quả cạnh biểu mẫu, hình khoa học dùng hết chiều ngang phía dưới. [1280 × 720](figures/application/viewport-1280.png) | PASS | Phần hình và bảng chi tiết có thể cần cuộn. |
+| 7. Bố cục thích ứng theo nhiệm vụ | Dự đoán có sơ đồ đo. Trang phân tích dùng tóm tắt một dòng, có lối quay lại. [So sánh](figures/application/interval-comparison.png) · [Phương pháp](figures/application/method.png) | PASS | Bốn khu vực dùng chung trạng thái. |
+| 8. Luồng laptop | Tại bốn khổ desktop thật, nút tính và khối lượng cùng hiện sau khi đưa đầu widget vào vùng nhìn. [1366 × 768](figures/application/viewport-1366.png) · [1440 × 900](figures/application/viewport-1440.png) · [1920 × 1080](figures/application/viewport-1920.png) | PASS | Đo trong viewport nội dung, có thanh công cụ JupyterLab. |
+| 9. Trực quan hóa khoa học | Chín hình, hai cách dàn trục, mô tả và bảng. [Histogram](figures/application/residual-histogram.png) · [Boxplot](figures/prediction-errors.png) · [Thực tế và dự đoán](figures/application/actual-predicted.png) | PASS | Độ phân giải theo hai canvas Matplotlib. |
+| 10. Tooltip theo dữ liệu | M2, 90%, ID 119 Adelie có thực tế 3.325,0 g và dự đoán 3.953,4 g. Trỏ, chạm hoặc chọn qua danh sách đều truy xuất cùng bản ghi. [Điểm đang chọn](figures/application/point-inspector.png) | PASS | Với các điểm trùng vị trí, dùng danh sách để chọn đúng ID. |
+| 11. Dấu chọn | Vòng đánh dấu theo điểm, kiểu nét theo mô hình, × cho cá thể ngoài dải, hạng hiệu chỉnh có ký hiệu riêng. [Dải test](figures/application/test-plot.png) · [Phân vị](figures/application/method.png) | PASS | Hình nhấn đúng predictor và protocol hiện hành. |
+| 12. Phóng to | Hộp thoại native, hình lớn hơn trên laptop, Tab ở trong hộp, Esc đóng, giữ ID đang xem và khôi phục tiêu điểm. [Hình mở rộng](figures/application/expanded.png) | PASS | Thao tác thay đổi vùng hiển thị. |
+| 13. Trợ giúp tại chỗ | Kết quả giải thích hai cận, mức mục tiêu, tỷ lệ test và MAE. Mỗi hình có trợ giúp theo ngữ cảnh. Bảng tra giữ đủ 18 thuật ngữ. [Phương pháp](figures/application/method.png) | PASS | Nội dung bằng tiếng Việt. |
+| 14. Trình diễn độc lập | Voilà chạy cùng cell và widget, chặn mọi HTTP ngoài localhost trong bài thử. [Màn hình trình diễn](figures/application/presentation.png) | PASS | Mỗi phiên cần một kernel trong môi trường Python cục bộ đã cài. |
+| 15. Toàn màn hình | Vào/thoát fullscreen khi trình duyệt hỗ trợ và lấy lại focus. Chế độ trình diễn luôn có thể chạy một lệnh. [Runner](../tests/browser_prediction.py) | PASS | Quyền fullscreen do trình duyệt quyết định. |
+| 16. Xuất kết quả | Tải và đọc lại CSV để đối chiếu đầu vào, protocol, predictor, cận, MAE và coverage. Sau khi sửa số đo, đường tải biến mất. [Kiểm tra tám tổ hợp mô hình và protocol](../tests/test_prediction_evidence.py) | PASS | Một hàng/lần dự đoán. Khoảng và CI chỉ xuất khi có cơ sở. |
+| 17. Phản hồi thao tác | Trạng thái đang tính, chờ tính, lỗi và khôi phục. Đã thử tooltip qua focus và pointer, cùng tùy chọn giảm chuyển động. [Trạng thái lỗi](figures/application/input-error.png) | PASS | Độ trễ của kernel phụ thuộc máy. |
+| 18. Các lỗi trên mobile | Nút khôi phục xuống dòng riêng, tên mô hình có hàng đủ rộng và liên kết đọc kết quả dùng chữ đậm trên nền sáng. [Điện thoại](figures/prediction-narrow.png) | PASS | Bảng dài có vùng cuộn riêng. |
+| 19. Khả năng tiếp cận | Kiểm axe, bàn phím, tương phản, zoom và lời đọc Orca. [Kết quả chi tiết](ui-checks.json) | PASS với các phép đã chạy | VoiceOver và NVDA **NOT VERIFIED**. Chưa có chứng nhận WCAG. |
+| 20. Responsive | Tám khổ từ 320 đến 1920 px được lặp trên các hình. Zoom trình duyệt thật 200% cho 683 CSS px từ 1366 px. [Runner](../tests/browser_prediction.py) | PASS | Điện thoại vật lý **NOT VERIFIED**. |
+| 21. Hiệu năng | Đo kernel mới và thao tác lặp cho cùng phiên bản Chromium. [Kết quả trước và sau](#hiệu-năng) | PASS về phép đo | Mẫu cục bộ, ba lượt cho mỗi thao tác, có nêu chi phí khởi tạo. |
+| 22. Trình duyệt | Chromium và Firefox với notebook, WebKit với bản trình diễn. [Kết quả theo engine](ui-checks.json) | PASS cho ba engine | Safari bản thương mại **NOT VERIFIED**. |
+| 23. Đầy đủ chức năng | Bốn mô hình, hai protocol, năm đầu vào, năm preset, hai mức bao phủ, reset, chín đồ thị và glossary. [Runner](../tests/browser_prediction.py) | PASS | M4 chờ Phúc. |
+| 24. Tính đúng đắn thống kê | Bảng/điểm test đối chiếu predictor, hạng 51/55 và 54/55 cho hai mức. Ba CI bootstrap chênh lệch MAE chứa 0. [Số liệu](comparison.json) | PASS | Coverage biên phụ thuộc giả thiết trao đổi được. |
+| 25. Tái lập | 34 unit test, notebook kernel sạch, JSON và ba PNG evaluation khớp từng byte. [Bàn giao](handoff.md) | PASS trong phạm vi bốn mô hình | Kiểm tra đủ năm mô hình còn báo hai mục M4. |
+| 26. Trải nghiệm demo | Mở app bằng một lệnh rồi đi từ cá thể đến 69 ID, thay mức, xem phương pháp, xuất và khôi phục. [Demo hai phút](section-3-4-application.md#demo-hai-phút) | PASS cho luồng thực thi | Thời lượng là gợi ý cho người trình bày. |
+| 27. Rubric Application | Nhập đặc trưng, dự đoán, đọc hình và diễn giải cho cả bốn mô hình. [Đối chiếu đề](handoff.md) | PASS về đối chiếu | Điểm chính thức **NOT VERIFIED**. |
+| 28. Lời dặn giảng viên | Có nhận xét, histogram, boxplot, mức bất định, kiểm đếm coverage và demo. [Đối chiếu từ góc nhìn người chấm](#trải-nghiệm-của-người-chấm) | PASS về các tác vụ đã thử | Phản hồi trực tiếp của giảng viên **NOT VERIFIED**. |
 
-## Đối chiếu với đề và lời dặn
+## Accessibility và tương thích
 
-| Nguồn | Yêu cầu hoặc mục đích | Vị trí bàn giao |
-| --- | --- | --- |
-| Đề Lab 01, §3.4 | Giao diện tương tác để nhập đặc trưng và nhận dự đoán | [Notebook mục 5](../source/lab01.ipynb), [luồng nhập và dự đoán](section-3-4-application.md) |
-| Đề Lab 01, §3.1–3.3 và mục nộp | Giải thích lựa chọn, so sánh hiệu năng, tổng hợp báo cáo | [Báo cáo khoa học](integration.md), [PDF](integration.pdf), [đối chiếu toàn nhóm](handoff.md) |
-| Lời dặn nhóm ghi nhận | Dùng đơn giản, chỉ rõ độ tin cậy, có nhận xét, histogram và boxplot, chú trọng hình thức. Tỷ trọng định hướng khoảng 90% báo cáo và 10% ứng dụng. | [Kết quả mặc định](figures/prediction-dashboard.png), [69 cá thể test](figures/application/test-intervals.png), [phân bố sai số](figures/application/residual-histogram.png) |
-| Nhóm chủ động mở rộng | Preset từ train, forest plot ΔMAE, hai loại CV, tám mức so sánh mô hình–coverage, bảy bước hiệu chỉnh, glossary và kiểm thử UI. | [Bảng và forest plot](figures/application/benchmark.png), [phương pháp](figures/application/method.png), [artifact](comparison.json) |
+Trong notebook, Chromium 159 và Firefox 159 chạy qua mặc định, ô sai, so sánh khoảng, dải test, hình mở rộng, coverage–width, phương pháp, benchmark, thực tế–dự đoán, sai số theo loài, mobile và giao diện tối. WebKit 18.4 chạy cùng luồng với Voilà, nguồn ngoài localhost bị chặn. Axe-core 4.14.1 kiểm tra A/AA được hỗ trợ qua WCAG 2.2 trên vùng ứng dụng. Số vi phạm tự động là 0. Với WebKit, axe yêu cầu kiểm tra thủ công tương phản ở một số select, chữ SVG và tiêu đề phủ ảnh. [Kết quả từng trạng thái](ui-checks.json)
 
-## Đánh giá thiết kế trước và sau
+Theo độ chói sRGB, chữ chính trên nền trắng đạt 12,69∶1, nút chính 7,79∶1, hai trạng thái chữ SVG trên nền giấy đạt 6,20 và 6,30∶1. Nút đọc kết quả trên nền biểu mẫu đạt 7,49∶1, viền điều khiển trên nền trắng đạt 3,64∶1. Đo ảnh WebKit ở 320, 390, 768 và 1280 px bằng cách so nền ở cùng vị trí trước và sau khi ẩn chữ. Tỷ lệ thấp nhất của chữ phần đầu trang là 4,96∶1 ở 320 px. Chữ của select đang bật đạt 12,69∶1. Đường đo đang chọn còn dày hơn và các trường hợp ngoài khoảng còn có dấu ×. Người dùng bàn phím có thể duyệt từng điểm, mở số liệu và đóng hình phóng lớn bằng Esc. Bài thử dùng giảm chuyển động, forced colors, JupyterLab Light/Dark và 200% zoom thực của Chromium. [Màu và kiểu tương tác](../source/ui/panel.css)
 
-Rà bản dựng trong JupyterLab, ảnh trước/sau và các màn hình kết quả với cùng dữ liệu. Điểm dưới đây là nhận định thiết kế trên thang 100 cho lần rà này. Các chênh lệch phản ánh cả phạm vi mười chức năng mới. Các phép kiểm có kết quả nhị phân nằm ở bảng nghiệm thu phía trên. Nhóm chưa tổ chức chấm mù với người dùng hoặc giảng viên.
+Orca 43.1 trên Debian, AT-SPI và Chromium 156 đã đọc ô chiều dài cánh bơi, hướng dẫn sau khi sửa, trạng thái đang tính, dự đoán **3.573,0 g** cùng hai cận **2.936,7–4.209,3 g** sau khi tăng từ 197,0 lên 197,1 mm. Khi đổi điểm trong danh sách, Orca đọc biến, giá trị và khối lượng dự đoán của điểm mới. Đã thu tín hiệu tiếng nói qua PulseAudio vào thiết bị ảo. Đây là phép kiểm nội dung lời đọc và điều hướng. Phiên macOS chưa cấp quyền Accessibility cho tiến trình thử VoiceOver. Môi trường thử không có Windows/NVDA. SafariDriver trả HTTP 500 do tùy chọn Allow remote automation đang tắt. Chất lượng phát âm tiếng Việt của từng giọng chưa được người nghe đánh giá. [Biên bản thực chạy](ui-checks.json)
 
-| Tiêu chí | Trước | Sau | Căn cứ cho nhận định |
+## Hiệu năng
+
+Mac Apple M1, 8 GiB RAM, macOS 14.6.1, Python 3.12.15, JupyterLab 4.5.6, Chromium 159.0.8154.6, viewport 1366 × 768. Mỗi bản mở một browser context và kernel mới trên server đã chạy với cache hệ điều hành ấm. Ba lượt thao tác sau khi có kết quả. Số dưới đây là trung vị ở các hàng có ba lượt. [Runner benchmark](../tests/benchmark_prediction.py) · [Mẫu thời gian gốc](ui-checks.json)
+
+| Thao tác | Trước · `7497080` | Sau |
+| --- | ---: | ---: |
+| Khởi tạo PredictionApp từ bốn mô hình đã fit, trước lần vẽ đầu (một tiến trình riêng mỗi bản) | 9,428 s | 9,722 s |
+| Vẽ kết quả đầu sau khởi tạo trong Python | 119 ms | 113 ms |
+| Mở notebook tới khi có thể dự đoán | 15,492 s | 13,842 s |
+| Từ Run All tới kết quả sử dụng được | 12,501 s | 11,388 s |
+| Dự đoán lại cùng số đo | 188 ms | 37 ms |
+| Đổi mô hình và dự đoán | 224 ms | 108 ms |
+| Mở So sánh mô hình | 88 ms | 90 ms |
+| Chuyển sang hình hiệu chỉnh | 37 ms | 34 ms |
+| Khôi phục toàn bộ mặc định | 121 ms | 45 ms |
+| Sự kiện trỏ trên một điểm đến khung hình kế tiếp | Chưa có tooltip | 12,2 ms |
+
+Lần chạy đối chứng trước chỉnh sửa cho 17,322 s từ mở notebook đến tương tác. Phép đo so cặp sau đó chạy hai bản liền nhau với cùng runner. Thời gian riêng lẻ phụ thuộc tải máy và cache. Khi đưa bộ số đo mới vào cache lần đầu, lần dự đoán đầu của bản mới mất 194 ms. Bộ nhớ giữ tối đa sáu hình xu hướng gần nhất. Chuyển tab hoặc thay đầu vào dùng lại các predictor đã fit. [Test chặn fit ngoài ý muốn](../tests/test_prediction_evidence.py)
+
+Hai ảnh đồ thị xu hướng mặc định vẫn là 44.921 và 39.666 byte. Bản mới thêm khoảng 40.129 byte JSON nhãn và tọa độ cho chính hình đó. Sơ đồ SVG khoảng 4 kB thay cho PNG 113.058 byte từng nhúng vào widget. Ảnh phong cảnh 58.856 byte và font cục bộ 27.692 byte. Biên bản ghi số byte nguồn của từng tài nguyên. Trình duyệt còn nhận dữ liệu widget qua kết nối kernel. [Dữ liệu đo](ui-checks.json)
+
+## Scorecard thiết kế
+
+Điểm trung bình trước và sau lần lượt là **92,7/100** và **96,4/100**. Mỗi tiêu chí có trọng số bằng nhau. Hai cột dùng cùng phạm vi của lần này, kể cả các chức năng chưa có ở mốc trước. Các nhận xét thẩm mỹ là tự đánh giá. Các số đo và phép thử nằm ở phần nghiệm thu phía trên.
+
+| Tiêu chí | Trước | Sau | Căn cứ |
 | --- | ---: | ---: | --- |
-| Thẩm mỹ | 86 | 95 | Tiêu đề có phong cảnh vùng cực, khoảng trắng và điểm nhấn thị giác ở khối lượng. |
-| Chỉ đạo mỹ thuật | 83 | 95 | Bố cục gợi sổ tay thực địa xuyên suốt trang, đồ thị giữ nền trắng để đọc. |
-| Nhận diện | 87 | 96 | Chữ nghiêng ở tên Penguins, minh họa ba loài cạnh biểu mẫu và tranh phong cảnh ở tiêu đề. |
-| Typography | 85 | 94 | Ba cấp chữ cho tên ứng dụng, dự đoán và số liệu đối chiếu. Tên trục còn nhỏ tại chiều rộng tối thiểu. |
-| Bố cục | 84 | 94 | Lệnh dự đoán và kết quả hiện đồng thời ở hai khổ laptop. |
-| Khoảng cách | 87 | 93 | Thước và hai nhóm chỉ số có khoảng tách riêng. Trên mobile hẹp, luồng nhập vẫn dài. |
-| Hài hòa màu | 85 | 95 | Nền giấy, xanh nước biển và màu hổ phách phân vai cho cảnh nền, số chính và bằng chứng. |
-| Thứ bậc thị giác | 88 | 95 | Khối lượng lớn nhất, hai cận và số mẫu có vị trí cố định. |
-| Kiến trúc thông tin | 79 | 96 | Bốn khu vực dùng chung trạng thái, dữ liệu hàng chỉ mở khi cần. |
-| Điều hướng | 81 | 94 | Chọn vùng bằng bàn phím, hai lối chuyển tiêu điểm trên khổ hẹp. |
-| Dễ sử dụng | 86 | 93 | Năm preset, dự đoán, reset, lỗi tại trường. Đổi tham số còn cần bấm Dự đoán. |
-| Thiết kế tương tác | 87 | 94 | Khi sửa số đo, kết quả và hình cũ được bỏ cùng nhau. |
-| Trực quan hóa khoa học | 82 | 96 | Trục gram chung, dải 69 cá thể, đường chéo y = x, mốc ΔMAE = 0. |
-| Truyền đạt thống kê | 84 | 96 | Nêu mẫu số, độ rộng, số ngoài khoảng, bậc phân vị và giới hạn suy rộng. |
-| Khả năng tiếp cận | 88 | 92 | Có bảng, mô tả, trạng thái đọc và phím tắt theo điều khiển native. Chờ thử VoiceOver. |
-| Hiển thị đáp ứng | 88 | 93 | Chuyển sang hình khổ hẹp, bảng cuộn cục bộ và kiểm ở zoom trình duyệt 200%. |
-| Đầy đủ chức năng | 67 | 97 | Đã thử cả mười nhóm chức năng cho bốn predictor. |
-| Nhất quán thiết kế | 89 | 95 | Nút, thước, tiêu đề, chú giải và định dạng gram lặp lại giữa các vùng. |
-| Hiệu năng cảm nhận | 85 | 90 | Dùng lại các hình theo tập test và predictor đã fit. Kernel khởi động và lần vẽ Matplotlib đầu vẫn cần thời gian. Chưa benchmark độ trễ. |
-| Mức hoàn thiện | 85 | 94 | Tài nguyên cục bộ, ảnh thật, các trạng thái bàn phím, lỗi và phục hồi. |
-| Trải nghiệm demo | 82 | 95 | Có luồng từ một cá thể cụ thể đến 69 quan sát và reset. |
-| Đáp ứng rubric Application | 90 | 96 | Nhập, dự đoán, giải thích và hình tương tác tái lập từ notebook. |
-| Đáp ứng lời dặn giảng viên | 86 | 96 | Người xem kiểm đếm được các trường hợp dự đoán trượt ngay trong giao diện. |
+| Thẩm mỹ | 95 | 97 | Số chính, tranh vùng cực và trang số đo tạo ba điểm nhấn. Đồ thị giữ nền sáng. |
+| Chỉ đạo mỹ thuật | 95 | 97 | Từ phong cảnh đến bản vẽ đo, hình ảnh phục vụ cùng một hành trình quan sát. |
+| Nhận diện | 96 | 97 | Ba loài có dấu hiệu hình thái và tên khoa học ngay cạnh kết quả. |
+| Typography | 94 | 97 | Chữ số tabular thoáng hơn, gram nhỏ hơn và hai cận vẫn đọc được trên điện thoại. |
+| Bố cục | 94 | 97 | Biểu mẫu và kết quả đứng cạnh nhau trên laptop. Màn phân tích dành chiều rộng cho hình. |
+| Khoảng cách | 93 | 95 | Số đo gần nút tính. Biểu mẫu một cột vẫn dài trên màn hình nhỏ. |
+| Hài hòa màu | 95 | 96 | Xanh đậm cho kết quả, nền giấy cho giải phẫu và màu đồng cho phép đo đang chọn. |
+| Thứ bậc thị giác | 95 | 97 | Sau khi chọn tab phân tích, tên biểu đồ và dữ liệu trở thành nội dung chính. |
+| Minh họa | 81 | 96 | Ảnh tham chiếu tĩnh được thay bằng sơ đồ ba phép đo, đối chiếu hình thái với tài liệu. |
+| Ký hiệu | 90 | 95 | Dấu sao, dấu ×, thoi, kiểu nét và vòng tròn chọn đều có ý nghĩa. Dấu gần nhau cần danh sách. |
+| Điều hướng | 94 | 96 | Bốn mục chung trạng thái, thêm đường quay về ô nhập và focus trả lại sau khi xem hình. |
+| Kiến trúc thông tin | 96 | 97 | Dự đoán, so sánh, kiểm chứng và phương pháp trả lời bốn câu hỏi riêng. |
+| Nhất quán | 95 | 97 | Cùng một bộ điều khiển và cùng renderer khi mở notebook hoặc trình diễn. |
+| Dễ sử dụng | 93 | 96 | Preset, CSV, nút tính cạnh số đo và trợ giúp ở đúng kết quả. Chưa có nghiên cứu người dùng. |
+| Tương tác | 88 | 97 | Có thể chọn một ID bằng trỏ, chạm hoặc phím và đối chiếu với bảng. |
+| Phản hồi thao tác | 91 | 95 | Đánh dấu theo tiêu điểm, báo trường sai, giữ lựa chọn khi đóng hình và tôn trọng giảm chuyển động. |
+| Trực quan hóa khoa học | 96 | 98 | Chín hình có tọa độ lấy từ chính hai canvas, đơn vị, mô tả và bảng. |
+| Truyền đạt thống kê | 96 | 98 | Tách mục tiêu, tỷ lệ test và MAE. Xuất cả protocol, cỡ tập fit và hai cận theo gram. |
+| Khả năng tiếp cận | 92 | 94 | Đã thử thêm dialog native, bàn phím, WebKit, cảm ứng mô phỏng và zoom. Còn giới hạn thiết bị. |
+| Hiển thị đáp ứng | 93 | 96 | Tám khổ và ảnh compact riêng. Bảng nhiều cột vẫn cần cuộn cục bộ ở khổ nhỏ. |
+| Hiệu năng | 90 | 94 | Dự đoán lặp và reset nhanh hơn. Khởi tạo bốn predictor vẫn chiếm phần lớn thời gian. |
+| Đầy đủ chức năng | 89 | 98 | Bốn mô hình, chín hình, xuất đúng predictor và trình diễn ngoại tuyến. |
+| Mức hoàn thiện | 94 | 96 | Đã sửa vùng chạm SVG, tên điều khiển điểm, nút bị cắt và xuất dữ liệu cũ. |
+| Trình diễn | 87 | 98 | Chạy một lệnh, mở toàn màn hình và phóng to dữ liệu mà vẫn giữ cùng mô hình. |
+| Bao phủ rubric | 96 | 97 | Có thể thực hiện và tái lập đầu vào, dự đoán, khoảng và phần diễn giải. |
+| Trải nghiệm giảng viên | 93 | 96 | Có lộ trình hai phút từ phép đo đến ID ngoài khoảng. Chưa có phản hồi trực tiếp. |
 
-## Kiểm thử trình duyệt và số học
+## Trải nghiệm của người chấm
 
-- **Chromium 159 và Firefox 159.** Mỗi trình duyệt chạy notebook riêng, hoàn tất luồng bốn mô hình, hai protocol, năm đặc trưng, năm preset, đổi mức, chuyển khu vực, đọc glossary, hồi phục sau nhập sai và dự đoán lặp lại. Axe-core 4.14.1 ghi nhận **0 vi phạm, 0 kết quả cần xem thêm** ở mỗi trong 10 trạng thái trên mỗi trình duyệt. Các trạng thái gồm mặc định, ô số sai, bốn khoảng, dải test, coverage–width, phương pháp, benchmark, thực tế–dự đoán, sai số theo loài và mobile.
-- **Chrome 158.** Rà lại cây accessibility, phím mũi tên trong điều hướng, thứ tự focus, mở bảng dữ liệu ở 320 px, reset bảng thuật ngữ và JupyterLab Dark. Ở hai khổ 1440 × 900 và 1366 × 768, sau khi cuộn đến đầu widget, nút dự đoán bắt đầu ở khoảng y = 298 px, số dự đoán ở khoảng y = 397 px. Đã thử thêm 768, 480, 390 và 320 px. Ở Chromium, zoom thật qua API trình duyệt từ 100% lên 200% làm viewport nội dung từ 1366 còn 683 CSS px, chuyển được sang 69 cá thể test. Runner còn thử đổi kích thước, forced colors và reduced motion.
-- **Tương phản và cách đọc.** Chữ chính trên trắng đạt 12,69:1, nút chính đạt 7,79:1 và focus trên nền biểu mẫu đạt 5,53:1 theo luminance sRGB. Đường nền thước đạt ít nhất 3,10:1 so với nền kết quả, phần khoảng đạt 3,21:1 so với đường nền. Hai cận còn hiện bằng chữ số. Arrow chọn radio trong nhóm, Enter mở glossary, cập nhật live region đọc khối lượng và hai cận.
-- **Giới hạn kiểm thử.** Playwright WebKit dừng tại bước tạo trang trên macOS 14.6.1. SafariDriver cũng chưa tạo được phiên trong lần thử. Chưa xác nhận Safari, VoiceOver hoặc thiết bị cảm ứng thật. Axe chỉ đánh giá phần widget theo các tag WCAG A/AA được runner chọn.
-- **Đối chiếu số học.** 32/32 unit test, kiểm tra dependency, compile/import và notebook kernel sạch đạt. Bốn mô hình fit/predict trên cùng 69 ID. JSON chứa benchmark, nested CV, bootstrap, conformal tái tạo giống từng byte, ba PNG của evaluation cũng khớp. Hai dòng FAIL của kiểm tra toàn nhóm là `m4_configured` và `five_real_models_in_app`. [Mã kiểm tra](../source/check_week2.py) · [Test dữ liệu của các hình](../tests/test_prediction_evidence.py)
+| Câu hỏi của người lần đầu mở ứng dụng | Thao tác kiểm chứng |
+| --- | --- |
+| Bài toán là gì và năm biến có ý nghĩa gì? | Đọc câu mô tả đầu trang, chọn loài và giới tính, rồi chuyển giữa ba đường đo có nhãn và đơn vị mm. |
+| Có thể tạo dự đoán và hiểu khoảng không? | Chọn một preset, bấm **Dự đoán**, đọc điểm và hai cận trên cùng thước gram. Mở **Cách đọc kết quả** để xem cỡ tập và ý nghĩa mức bao phủ. |
+| Có cơ sở tin vào kết quả đến đâu? | Đối chiếu MAE trên test, coverage k/n, độ rộng và cảnh báo miền train của loài. Mục Phương pháp nêu giả định trao đổi được. |
+| Có thể tự kiểm lại coverage bằng dữ liệu thật không? | Với M2 ở 90%, mở bảng 69 hàng, chọn một ID ngoài khoảng trên đồ thị rồi tìm khối lượng thật so với hai cận. Đếm được 62 trong và 7 ngoài. |
+| So sánh mô hình và đọc nhận xét thế nào? | So bốn khoảng trên một trục. Chuyển Benchmark để xem chênh lệch MAE, CV và CI bootstrap. Giao diện nêu cả độ lớn và giới hạn kết luận. |
+| Histogram, boxplot và các trục có đúng nghĩa không? | Histogram dùng phần dư có dấu. Boxplot dùng trị tuyệt đối theo loài. Mở bảng tần số hoặc tứ phân vị. Hình thực tế–dự đoán có đường y = x. |
+| Thiết kế và trình diễn ra sao? | Chạy một lệnh, mở toàn màn hình, phóng to hình, quay về ô số, tải CSV và reset. Điểm hình thức là nhận định ở scorecard. Giảng viên chấm theo rubric chính thức. |
 
-Để tái lập các luồng trình duyệt, mở **bản sao notebook** bằng JupyterLab với cờ `--expose-app-in-browser`. Trong môi trường QA đã cài Playwright, Chromium/Firefox và axe-core cục bộ, chạy lệnh bên dưới với URL của bản sao. Thêm `--browser firefox` cho Firefox. `--evidence-dir` xuất ảnh của từng khu vực và hai viewport thật. Ảnh widget toàn chiều cao dùng viewport kéo dài để JupyterLab giữ cell trong DOM. [Runner trình duyệt](../tests/browser_prediction.py)
+## Tái chạy và nguồn thiết kế
+
+Từ môi trường đã cài requirements, chạy `python -m source.present` hoặc mở một bản sao notebook bằng `python -m jupyterlab --expose-app-in-browser`. Kiểm thử trình duyệt cần cài Playwright, browser binary tương thích và một bản axe-core cục bộ trong môi trường QA. URL notebook phải trỏ đúng bản sao vì runner thực thi tất cả cell. Mỗi engine dùng phiên sạch. [Mã kiểm thử](../tests/browser_prediction.py)
 
 ```bash
-python tests/browser_prediction.py "<URL notebook cục bộ>" --axe /duong/dan/axe.min.js --evidence-dir /tmp/penguin-screens
+python tests/browser_prediction.py "<URL notebook>" --axe /path/to/axe.min.js --touch --evidence-dir /tmp/palmer-shots
+python tests/browser_prediction.py "<URL notebook khác>" --axe /path/to/axe.min.js --browser firefox
+python tests/browser_prediction.py http://127.0.0.1:8866 --presentation --browser webkit --axe /path/to/axe.min.js
+python tests/benchmark_prediction.py "<URL notebook mới>"
 ```
 
-## Quyết định thiết kế, nguồn và công cụ
+Hướng mỹ thuật lấy cảm hứng từ cách tài liệu bảo tàng kết nối hình loài với dữ kiện. Sơ đồ đo là vector thiết kế riêng. Vòng dữ liệu dùng nguyên tắc chọn dấu gần con trỏ trong tọa độ hiển thị. Danh sách và bảng cho phép chọn chính xác khi xem bằng bàn phím. Hộp thoại dùng hành vi focus và Escape của trình duyệt. Bộ chữ Bricolage Grotesque cục bộ giữ giấy phép SIL OFL. [Smithsonian Ocean](https://ocean.si.edu/ocean-life/seabirds/penguins) · [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/) · [Observable Plot](https://observablehq.com/plot/interactions/pointer) · [WAI dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) · [Giấy phép font](../source/ui/fonts/OFL.txt) · [Voilà](https://voila.readthedocs.io/en/stable/using.html)
 
-- Giữ một ứng dụng trong notebook. Đã xem xét mở rộng trang cuộn dọc và tách khu vực theo câu hỏi khoa học. Bốn khu vực cho phép chuyển từ cá thể sang bằng chứng trên test mà vẫn giữ predictor, mức bao phủ và đầu vào. Ở các khổ hẹp, thước và số liệu xếp lại theo dòng, từng bảng có thể cuộn riêng.
-- Giữ nền đồ thị sáng, hiển thị đơn vị và dùng cả marker/nét vẽ. Đặt mô tả và bảng ngay sau đồ thị để người đọc kiểm chứng từng điểm. Thiết kế nhóm radio dùng hành vi bàn phím native. [WAI – Complex Images](https://www.w3.org/WAI/tutorials/images/complex/) · [WAI – Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/) · [Observable Plot – Rule](https://observablehq.com/plot/marks/rule)
-- Đã dùng **Frontend Design** của Anthropic, **UI/UX Pro Max** và **Design System**. Skill mới cài là Frontend Design, từ commit chính thức `e4bb5d9` qua Skill Installer. Dùng ImageGen để tạo phong cảnh minh họa mang tính trang trí, đóng gói JPEG cục bộ. Ảnh về kết quả thực nghiệm đều chụp từ notebook. Playwright và axe-core chỉ phục vụ QA. [Frontend Design](https://github.com/anthropics/skills/tree/e4bb5d960d87126ff3b3a8af1a104b7db67560ba/skills/frontend-design) · [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)
-- Minh họa ba loài của Allison Horst, chữ Bricolage Grotesque được đóng gói dưới SIL OFL 1.1. [Artwork by @allison_horst](https://allisonhorst.github.io/palmerpenguins/articles/art.html) · [Giấy phép phông](../source/ui/fonts/OFL.txt)
-- Checklist M4 cho lần tích hợp sau gồm tiếp nhận estimator thật của Phúc, kiểm tra fit/hyperparameter selection chỉ dùng train, đối chiếu đúng 69 ID, bổ sung benchmark và bootstrap, fit lại trên 218 proper train, hiệu chỉnh riêng trên 55 mẫu và kiểm hai mức. Sau đó mới mở lựa chọn M4 tương ứng, chạy lại UI, notebook và toàn bộ suite. [Bàn giao của nhóm](handoff.md)
+Đã dùng **Frontend Design** (Anthropic), **UI/UX Pro Max** và **Design System**. Frontend Design đã được tải và cài từ commit chính thức `e4bb5d9` trong đợt trước. Hai skill còn lại đã có trong môi trường. Lần này dùng lại ba skill, Playwright, axe-core và Orca. [Frontend Design](https://github.com/anthropics/skills/tree/e4bb5d960d87126ff3b3a8af1a104b7db67560ba/skills/frontend-design) · [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) · [Danh mục OpenAI Skills](https://github.com/openai/skills)
+
+Khi nhận M4, kiểm estimator thật của Phúc, quy trình chọn cấu hình chỉ trên train, benchmark trên 69 ID, nested CV và bootstrap theo cặp. Fit conformal trên 218 proper train, hiệu chỉnh riêng trên 55 mẫu và kiểm coverage ở 90%/95%. Sau đó mới đưa M4 vào đúng chế độ, tái tạo metric, chạy lại notebook, các luồng UI và xuất CSV. [Checklist tích hợp](handoff.md#lần-tích-hợp-tiếp-theo)

@@ -88,7 +88,9 @@ Bảo đảm conformal là bao phủ biên khi calibration và cá thể mới t
 Người dùng chọn một trong bốn mô hình, nhập ba số đo và hai thuộc tính phân loại. Chế độ mặc định hiển thị dự đoán cùng khoảng cho cá thể, sai số MAE và số cá thể test nằm trong khoảng của chính predictor đó. Trên thước gram, hình thoi đánh dấu dự đoán điểm và đoạn sáng thể hiện độ rộng khoảng. Với OLS mặc định, khi chuyển từ 95% xuống 90%, độ rộng giảm từ 1.272,58 g xuống 1.164,93 g. Hai mức dùng cùng thước từ 2.500 g đến 6.500 g. Bên cạnh thước là tỷ lệ bao phủ thực nghiệm và MAE trên tập test. Chế độ benchmark gọi mô hình fit toàn bộ train, cho phép đọc CI và PI cổ điển của OLS. Mục So sánh mô hình đặt bốn khoảng trên một trục gram cho cùng đầu vào. Ở chế độ benchmark, mục này hiển thị ΔMAE so với OLS, CI bootstrap và hai quy trình CV. Biểu đồ thay một đầu vào và giữ bốn đầu vào còn lại. Các chấm nền là cá thể quan sát với những tổ hợp đầu vào khác nhau.
 
 ![Giao diện dự đoán trong cửa sổ JupyterLab.](figures/application/viewport-1366.png)
-*Giao diện trên laptop. Khối lượng, hai cận và số mẫu bao phủ nằm ngay dưới các điều khiển.*
+*Giao diện trên laptop. Nhập số đo bên trái và đọc khối lượng, hai cận cùng số cá thể được bao phủ bên phải.*
+
+Hình giải phẫu liên kết từng ô nhập với vị trí đo trên cánh bơi hoặc mỏ của loài đang chọn. Người xem có thể đọc một điểm bằng chuột, cảm ứng hoặc phím mũi tên, phóng to biểu đồ và tải CSV của lần dự đoán hiện hành. Lệnh `python -m source.present` mở riêng phần ứng dụng trên localhost cho buổi trình diễn.
 
 Từ **Kiểm chứng khoảng**, người xem có thể đọc hai cận, dự đoán và khối lượng thật theo ID. Với M2, khi chuyển từ 90% lên 95%, số cá thể trong dải tăng từ 62 lên 68 trên cùng 69 cá thể, với độ rộng tăng 343,92 g. **Phương pháp** cho thấy chính sự thay đổi từ sai số hiệu chỉnh thứ 51 lên thứ 54 tạo ra hai khoảng này. Năm cá thể mẫu lấy từ train giúp bắt đầu demo nhanh. Nút khôi phục đưa mô hình, đầu vào và kết quả về cùng mặc định.
 

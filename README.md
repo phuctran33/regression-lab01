@@ -39,6 +39,18 @@ Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và ch�
 
 **Khôi phục mặc định** đưa toàn bộ ứng dụng về ví dụ OLS ban đầu. Các hình có mô tả và bảng đọc được bằng bàn phím. Giữ `report/comparison.json` trong bản bàn giao để hiện CV và bootstrap đã đối chiếu. [Demo hai phút](report/section-3-4-application.md#demo-hai-phút) · [Ảnh và nghiệm thu](report/ui-audit.md)
 
+## Trình diễn độc lập
+
+Từ thư mục dự án, trong môi trường đã cài [requirements.txt](requirements.txt), chạy một lệnh.
+
+```bash
+python -m source.present
+```
+
+Mở địa chỉ localhost mà Voilà in ra (mặc định `http://127.0.0.1:8866`). Chờ kết quả OLS đầu tiên rồi chọn **Toàn màn hình** nếu muốn chiếu. Mỗi phiên dùng cùng dữ liệu, mô hình và widget như mục 5 của notebook. Sau khi cài môi trường, ứng dụng chạy ngoại tuyến. Dùng **Ctrl+C** trong terminal để dừng.
+
+Chọn một đường đo trên sơ đồ để sửa số đo tương ứng. Trên biểu đồ, trỏ, chạm hoặc chọn **Điểm dữ liệu** để đọc quan sát. **Mở rộng biểu đồ** giữ điểm đang xem. **Tải CSV** lưu một dòng gồm đầu vào, mô hình, dự đoán, khoảng và kết quả kiểm chứng hiện hành. [Hướng dẫn đọc và xuất kết quả](report/section-3-4-application.md)
+
 ## Phân công mô hình
 
 | Thành viên | Tệp phụ trách | Thuật toán |

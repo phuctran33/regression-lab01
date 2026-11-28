@@ -1,0 +1,457 @@
+{
+  "application_commit": "b8544f410ea7df28ec04637ae7044a801ae4a5eb",
+  "date_local": "2026-11-28",
+  "baseline": "7497080751f42cc431cc39c0605c72564823a32c",
+  "platform": {
+    "chip": "Apple M1",
+    "RAM_GiB": 8,
+    "macOS": "14.6.1",
+    "python": "3.12.15",
+    "jupyterlab": "4.5.6",
+    "voila": "0.5.13",
+    "axe_core": "4.14.1"
+  },
+  "browser_runs": [
+    {
+      "engine": "chromium 159.0.8154.6",
+      "entry": "jupyterlab",
+      "open_to_first_prediction_s": 16.29,
+      "outside_http_requests": null,
+      "touch": true,
+      "axe": {
+        "desktop": {
+          "violations": 0,
+          "review": {}
+        },
+        "invalid": {
+          "violations": 0,
+          "review": {}
+        },
+        "intervals": {
+          "violations": 0,
+          "review": {}
+        },
+        "test-intervals": {
+          "violations": 0,
+          "review": {}
+        },
+        "expanded": {
+          "violations": 0,
+          "review": {}
+        },
+        "coverage-width": {
+          "violations": 0,
+          "review": {}
+        },
+        "method": {
+          "violations": 0,
+          "review": {}
+        },
+        "benchmark": {
+          "violations": 0,
+          "review": {}
+        },
+        "actual": {
+          "violations": 0,
+          "review": {}
+        },
+        "species-errors": {
+          "violations": 0,
+          "review": {}
+        },
+        "mobile": {
+          "violations": 0,
+          "review": {}
+        },
+        "dark": {
+          "violations": 0,
+          "review": {}
+        }
+      }
+    },
+    {
+      "engine": "firefox 159.0",
+      "entry": "jupyterlab",
+      "open_to_first_prediction_s": 14.56,
+      "outside_http_requests": null,
+      "touch": false,
+      "axe": {
+        "desktop": {
+          "violations": 0,
+          "review": {}
+        },
+        "invalid": {
+          "violations": 0,
+          "review": {}
+        },
+        "intervals": {
+          "violations": 0,
+          "review": {}
+        },
+        "test-intervals": {
+          "violations": 0,
+          "review": {}
+        },
+        "expanded": {
+          "violations": 0,
+          "review": {}
+        },
+        "coverage-width": {
+          "violations": 0,
+          "review": {}
+        },
+        "method": {
+          "violations": 0,
+          "review": {}
+        },
+        "benchmark": {
+          "violations": 0,
+          "review": {}
+        },
+        "actual": {
+          "violations": 0,
+          "review": {}
+        },
+        "species-errors": {
+          "violations": 0,
+          "review": {}
+        },
+        "mobile": {
+          "violations": 0,
+          "review": {}
+        },
+        "dark": {
+          "violations": 0,
+          "review": {}
+        }
+      }
+    },
+    {
+      "engine": "webkit 18.4",
+      "entry": "voila",
+      "open_to_first_prediction_s": 14.04,
+      "outside_http_requests": 0,
+      "touch": false,
+      "axe": {
+        "desktop": {
+          "violations": 0,
+          "review": {
+            "color-contrast": 9
+          }
+        },
+        "invalid": {
+          "violations": 0,
+          "review": {
+            "color-contrast": 9
+          }
+        },
+        "intervals": {
+          "violations": 0,
+          "review": {
+            "color-contrast": 3
+          }
+        },
+        "test-intervals": {
+          "violations": 0,
+          "review": {
+            "color-contrast": 4
+          }
+        },
+        "expanded": {
+          "violations": 0,
+          "review": {}
+        },
+        "coverage-width": {
+          "violations": 0,
+          "review": {
+            "color-contrast": 3
+          }
+        },
+        "method": {
+          "violations": 0,
+          "review": {}
+        },
+        "benchmark": {
+          "violations": 0,
+          "review": {
+            "color-contrast": 2
+          }
+        },
+        "actual": {
+          "violations": 0,
+          "review": {}
+        },
+        "species-errors": {
+          "violations": 0,
+          "review": {
+            "color-contrast": 3
+          }
+        },
+        "mobile": {
+          "violations": 0,
+          "review": {
+            "color-contrast": 3
+          }
+        },
+        "dark": {
+          "violations": 0,
+          "review": {
+            "color-contrast": 9
+          }
+        }
+      }
+    }
+  ],
+  "viewports_px": [
+    [
+      1920,
+      1080
+    ],
+    [
+      1440,
+      900
+    ],
+    [
+      1366,
+      768
+    ],
+    [
+      1280,
+      720
+    ],
+    [
+      768,
+      900
+    ],
+    [
+      430,
+      844
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      320,
+      720
+    ]
+  ],
+  "native_chromium_zoom": {
+    "api_factor": 2,
+    "inner_css_px_before": [
+      1366,
+      681
+    ],
+    "after": [
+      683,
+      340
+    ],
+    "test_view_count": "67/69",
+    "horizontal_widget_overflow": false
+  },
+  "assistive_technology": {
+    "reader": "Orca 43.1, AT-SPI, Chromium 156.0.8078.114, Debian 12",
+    "speech_examples": [
+      "Chiều dài cánh bơi (mm) 197 spin button required.",
+      "Bấm Dự đoán để cập nhật kết quả và biểu đồ.",
+      "Đang tính dự đoán và vẽ biểu đồ.",
+      "OLS, khối lượng dự đoán 3.573,0 g. Khoảng cá thể 95% từ 2.936,7 đến 4.209,3 g. Dự đoán theo Chiều dài cánh bơi (mm). Dấu sao ứng với OLS, 3.573,0 g.",
+      "Điểm dữ liệu combo box.",
+      "OLS · xu hướng. Chiều dài cánh bơi (mm) 172,0 · Dự đoán 3.258,1 g",
+      "Mở rộng biểu đồ push button."
+    ],
+    "dialog_focus": {
+      "open": "Đóng biểu đồ",
+      "after_escape": "Mở rộng biểu đồ"
+    },
+    "pulse_monitor": {
+      "sample_rate_Hz": 16000,
+      "PCM_s16le_frames": 900535,
+      "nonzero_frames": 475148
+    },
+    "voiceover": "NOT VERIFIED; macOS Accessibility permission unavailable to this process",
+    "nvda": "NOT VERIFIED; Windows environment unavailable",
+    "hardware_touch": "NOT VERIFIED; touch used browser emulation"
+  },
+  "safari_native": "NOT VERIFIED. SafariDriver returned HTTP 500 session not created. Allow remote automation is disabled in Safari settings.",
+  "performance": {
+    "method": "Fresh Chromium 1366x768 context and fresh Jupyter kernel for each revision, already-running localhost server. Three samples after the first result. Tooltip measures pointer dispatch to next animation frame, not device latency. Separate Python process per revision for constructor and first draw.",
+    "baseline_audit_open_s": 17.322,
+    "baseline": {
+      "engine": "159.0.8154.6",
+      "open_to_interactive_s": 15.492,
+      "run_all_to_result_s": 12.501,
+      "predict_ms": [
+        189,
+        187,
+        188
+      ],
+      "model_and_predict_ms": [
+        224,
+        218,
+        226
+      ],
+      "compare_tab_ms": [
+        104,
+        88,
+        85
+      ],
+      "method_chart_ms": [
+        88,
+        35,
+        37
+      ],
+      "reset_ms": [
+        276,
+        118,
+        121
+      ]
+    },
+    "delivery": {
+      "engine": "159.0.8154.6",
+      "open_to_interactive_s": 13.842,
+      "run_all_to_result_s": 11.388,
+      "predict_ms": [
+        194,
+        36,
+        37
+      ],
+      "model_and_predict_ms": [
+        230,
+        108,
+        67
+      ],
+      "compare_tab_ms": [
+        97,
+        90,
+        86
+      ],
+      "method_chart_ms": [
+        90,
+        33,
+        34
+      ],
+      "reset_ms": [
+        49,
+        43,
+        45
+      ],
+      "tooltip_to_frame_ms": [
+        12.2,
+        13.1,
+        11.8
+      ]
+    },
+    "python_baseline": {
+      "init_s": 9.428,
+      "first_view_s": 0.119,
+      "png_wide_B": 44921,
+      "png_compact_B": 39666,
+      "inspect_json_B": 2
+    },
+    "python_delivery": {
+      "init_s": 9.722,
+      "first_view_s": 0.113,
+      "png_wide_B": 44921,
+      "png_compact_B": 39666,
+      "inspect_json_B": 40129
+    },
+    "packaged_ui_files_bytes": {
+      "baseline": {
+        "chart.js": 1329,
+        "figure-picker.js": 1329,
+        "fonts/OFL.txt": 4402,
+        "fonts/bricolage-600.woff2": 27692,
+        "glossary.html": 2618,
+        "measurement.js": 2902,
+        "palmer-penguins.png": 113058,
+        "palmer-shore.jpg": 58856,
+        "panel.css": 15872,
+        "result.js": 2121
+      },
+      "delivery": {
+        "anatomy.js": 2384,
+        "anatomy.svg": 3964,
+        "chart.js": 5588,
+        "figure-picker.js": 2400,
+        "fonts/OFL.txt": 4402,
+        "fonts/bricolage-600.woff2": 27692,
+        "glossary.html": 2618,
+        "measurement.js": 2943,
+        "palmer-penguins.png": 113058,
+        "palmer-shore.jpg": 58856,
+        "panel.css": 25115,
+        "result.js": 3539,
+        "voila/templates/palmer/conf.json": 25,
+        "voila/templates/palmer/index.html.j2": 635,
+        "voila/templates/palmer/spinner.macro.html.j2": 215
+      }
+    }
+  },
+  "science": {
+    "unit_tests_passed": 34,
+    "checks": {
+      "shared_data_protocol": "PASS",
+      "requirements_versions": "PASS",
+      "m1_cli": "PASS",
+      "m1_configured": "PASS",
+      "m2_cli": "PASS",
+      "m2_configured": "PASS",
+      "m3_cli": "PASS",
+      "m3_configured": "PASS",
+      "m4_cli": "PASS",
+      "m4_configured": "FAIL",
+      "unit_suite": "PASS",
+      "shared_ols_baseline": "PASS",
+      "notebook_and_m1_app": "PASS",
+      "five_real_models_in_app": "FAIL"
+    },
+    "expected_pending": [
+      "m4_configured",
+      "five_real_models_in_app"
+    ],
+    "comparison_sha256_recomputed": "c9ebd8640ccbb9c2bf721d90b0ba0971f2f8c6e17d612842f3b3fe4c5b7023d9",
+    "evaluation_png_sha256_recomputed": {
+      "section-3-3-ols-diagnostics.png": "0b8b64765e38b1f2d383fe61ca089e7b0e0538a8ac55d3644ce2c648268249e5",
+      "section-3-3-smooth-effects.png": "7329f5987e7ffb9c73ba70567090f4e2118cd31e1b0a3544bf8d8405b13934e4",
+      "section-3-3-test-predictions.png": "25033d300fa5fa01eb03c1dc2771aad92dd2ec155b080ac806c557e04c5c8c9f"
+    }
+  },
+  "webkit_contrast_samples": {
+    "method": "Read the CSS text colors and sample pixels beneath painted glyphs in two header screenshots, with and without text at identical geometry. Select text and background use computed CSS values. Ratios use sRGB relative luminance.",
+    "by_viewport_width": {
+      "320": {
+        "header_min_by_ink": {
+          "title": 11.85,
+          "italic": 5.77,
+          "subtitle": 4.96
+        },
+        "select_min_ratio": 12.69
+      },
+      "390": {
+        "header_min_by_ink": {
+          "title": 11.85,
+          "italic": 6.56,
+          "subtitle": 6.09
+        },
+        "select_min_ratio": 12.69
+      },
+      "768": {
+        "header_min_by_ink": {
+          "title": 11.85,
+          "italic": 7.41,
+          "subtitle": 7.61
+        },
+        "select_min_ratio": 12.69
+      },
+      "1280": {
+        "header_min_by_ink": {
+          "title": 11.85,
+          "italic": 7.51,
+          "subtitle": 8.31
+        },
+        "select_min_ratio": 12.69
+      }
+    }
+  }
+}
