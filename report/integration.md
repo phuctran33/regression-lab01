@@ -85,7 +85,7 @@ Bảo đảm conformal là bao phủ biên khi calibration và cá thể mới t
 
 ## 3.4. Ứng dụng
 
-Người dùng chọn một trong bốn mô hình, nhập ba số đo và hai thuộc tính phân loại. Chế độ mặc định hiển thị dự đoán cùng khoảng cho cá thể, sai số MAE và số cá thể test nằm trong khoảng của chính predictor đó. Đổi mức 90%/95% thay đổi hai cận. Chế độ benchmark gọi mô hình fit toàn bộ train, cho phép đọc CI và PI cổ điển của OLS. Nút so sánh giữ cả đầu vào và protocol đồng nhất. Biểu đồ thay một đầu vào và giữ bốn đầu vào còn lại. Các chấm nền là cá thể quan sát với những tổ hợp đầu vào khác nhau.
+Người dùng chọn một trong bốn mô hình, nhập ba số đo và hai thuộc tính phân loại. Chế độ mặc định hiển thị dự đoán cùng khoảng cho cá thể, sai số MAE và số cá thể test nằm trong khoảng của chính predictor đó. Trên thước gram, hình thoi đánh dấu dự đoán điểm và đoạn sáng thể hiện độ rộng khoảng. Với OLS mặc định, khi chuyển từ 95% xuống 90%, độ rộng giảm từ 1.272,58 g xuống 1.164,93 g. Hai mức dùng cùng thước từ 2.500 g đến 6.500 g. Bên cạnh thước là tỷ lệ bao phủ thực nghiệm và MAE trên tập test. Chế độ benchmark gọi mô hình fit toàn bộ train, cho phép đọc CI và PI cổ điển của OLS. Nút so sánh giữ cả đầu vào và protocol đồng nhất. Biểu đồ thay một đầu vào và giữ bốn đầu vào còn lại. Các chấm nền là cá thể quan sát với những tổ hợp đầu vào khác nhau.
 
 ![Giao diện dự đoán và khoảng cá thể thực tế trong JupyterLab.](figures/prediction-dashboard.png)
 

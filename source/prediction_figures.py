@@ -4,7 +4,7 @@ from io import BytesIO
 
 import numpy as np
 from matplotlib.figure import Figure
-from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import FuncFormatter, MaxNLocator
 
 from .modeling import CATEGORICAL, TARGET
 
@@ -25,22 +25,44 @@ def table(headers, rows):
     return f"<details><summary>Xem số liệu của biểu đồ</summary><table><thead><tr>{heading}</tr></thead><tbody>{body}</tbody></table></details>"
 
 
-def finish(fig):
+def finish(fig, *, categorical_x=False, categorical_y=False):
+    """Draw the same artists on wide and narrow canvases, retaining both sets of labels."""
+    def tick(value, _position):
+        return number(value, 0 if float(value).is_integer() else 1).replace("-", "−")
+
     for ax in fig.axes:
-        ax.spines[["top", "right"]].set_visible(False)
-        ax.spines[["bottom", "left"]].set_color("#70888c")
-        ax.tick_params(colors="#334f57", labelsize=10)
+        ax.spines[["top", "right", "left"]].set_visible(False)
+        ax.spines["bottom"].set_color("#a0b4c3")
+        ax.tick_params(colors="#384f65", labelsize=9, length=0, pad=5)
         ax.set_axisbelow(True)
-        ax.grid(axis="y", color="#dce6e3", linewidth=.7)
-    with BytesIO() as stream:
-        fig.savefig(stream, format="png", dpi=135, facecolor="white")
-        return stream.getvalue()
+        ax.grid(axis="x" if categorical_y else "y", color="#d8e3eb", linewidth=.7)
+        if not categorical_y:
+            ax.yaxis.set_major_formatter(FuncFormatter(tick))
+        if not categorical_x:
+            ax.xaxis.set_major_formatter(FuncFormatter(tick))
+
+    def png():
+        with BytesIO() as stream:
+            fig.savefig(stream, format="png", dpi=145, facecolor="white")
+            return stream.getvalue()
+
+    wide = png()
+    fig.set_size_inches(3.05, 4.55 if len(fig.axes) > 1 else 3.25)
+    for ax in fig.axes:
+        if not categorical_x:
+            ax.xaxis.set_major_locator(MaxNLocator(4))
+        legend = ax.get_legend()
+        if legend is not None and len(legend.get_texts()) > 1:
+            ax.legend(loc="lower left", bbox_to_anchor=(0, 1.02, 1, .1), mode="expand",
+                      ncols=2, frameon=False, fontsize=8, handlelength=1.3,
+                      handletextpad=.35, borderaxespad=0, columnspacing=.7)
+    return wide, png()
 
 
 def trend_plot(selected, feature, labels, point, values, estimate, trends, support, radius):
     categorical = feature in CATEGORICAL
     difference = not categorical and {"OLS", "M3"}.issubset(trends)
-    fig = Figure(figsize=(6.3, 4.3 if difference else 3.2), layout="constrained")
+    fig = Figure(figsize=(7.2, 4.45 if difference else 3.2), layout="constrained")
     if difference:
         ax, delta = fig.subplots(2, 1, sharex=True, height_ratios=(3, 1))
     else:
@@ -50,7 +72,7 @@ def trend_plot(selected, feature, labels, point, values, estimate, trends, suppo
     x = np.arange(len(values)) if categorical else values
     selected_x = list(values).index(current) if categorical else current
     measured = sample[feature].map(dict(zip(values, x))) if categorical else sample[feature]
-    ax.scatter(measured, sample[TARGET], s=13, color="#879da0", alpha=.60, linewidth=0, label="Quan sát train")
+    ax.scatter(measured, sample[TARGET], s=13, color="#617a90", alpha=.90, linewidth=0, label="Quan sát train")
     for i, (name, y) in enumerate(trends.items()):
         color, line, marker = STYLES.get(name, ("#3d5160", "--", "s"))
         if categorical:
@@ -68,7 +90,7 @@ def trend_plot(selected, feature, labels, point, values, estimate, trends, suppo
     else:
         ax.xaxis.set_major_locator(MaxNLocator(6))
     ax.set_ylabel("Khối lượng (g)")
-    ax.legend(loc="lower left", bbox_to_anchor=(0, 1.01), ncol=3, frameon=False,
+    ax.legend(loc="lower left", bbox_to_anchor=(0, 1.01), ncol=4, frameon=False,
               fontsize=8.5, handlelength=2, columnspacing=1.2, borderaxespad=0)
     if difference:
         delta.axhline(0, color="#556a70", lw=.8, ls=":")
@@ -78,7 +100,7 @@ def trend_plot(selected, feature, labels, point, values, estimate, trends, suppo
     (delta if difference else ax).set_xlabel(labels.get(feature, feature))
     # Sample the numeric curve at three actual plotted locations. Categories are all shown.
     indices = range(len(values)) if categorical else [0, len(values) // 2, len(values) - 1]
-    rows = [[values[i] if categorical else number(values[i]), *[number(y[i]) for y in trends.values()]]
+    rows = [[{"female": "Cái", "male": "Đực"}.get(values[i], values[i]) if categorical else number(values[i]), *[number(y[i]) for y in trends.values()]]
             for i in indices]
     label = labels.get(feature, feature)
     alt = f"Dự đoán theo {label}. Dấu sao ứng với {selected}, {number(estimate[selected])} g."
@@ -88,11 +110,11 @@ def trend_plot(selected, feature, labels, point, values, estimate, trends, suppo
         caption += (f" Ở hai đầu miền đo, {escape(selected)} lần lượt dự đoán {number(first)} g và {number(last)} g.")
     if difference:
         caption += " Ô dưới thể hiện chênh lệch M3 trừ OLS theo gram."
-    return finish(fig), alt, caption + table([label, *[f"{n} (g)" for n in trends]], rows)
+    return finish(fig, categorical_x=categorical), alt, caption + table([label, *[f"{n} (g)" for n in trends]], rows)
 
 
 def error_plot(view, name, residuals, species):
-    fig = Figure(figsize=(6.3, 3.2), layout="constrained")
+    fig = Figure(figsize=(7.2, 3.2), layout="constrained")
     ax = fig.subplots()
     if view == "hist":
         counts, bins, _ = ax.hist(residuals, bins="sturges", color="#36848a", edgecolor="white")
@@ -118,4 +140,4 @@ def error_plot(view, name, residuals, species):
         alt = f"Sai số tuyệt đối của {name} theo loài trên {len(residuals)} cá thể test."
         caption = alt + " Hộp chứa 50% giá trị giữa. Vạch trong hộp là trung vị. Số cá thể mỗi loài khác nhau."
         caption += table(["Loài", "n", "Q1 (g)", "Trung vị (g)", "Q3 (g)"], rows)
-    return finish(fig), alt, caption
+    return finish(fig, categorical_y=view == "box"), alt, caption

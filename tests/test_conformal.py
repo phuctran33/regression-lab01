@@ -1,3 +1,5 @@
+import re
+import struct
 import unittest
 from unittest.mock import patch
 
@@ -111,3 +113,23 @@ class ConformalTests(unittest.TestCase):
         self.assertFalse(app.predict_button.disabled)
         app.predict_button.click()
         self.assertTrue(app.rendered)
+
+    def test_interval_graph_uses_one_mass_scale_across_coverage_levels(self):
+        train, test = split_penguins(load_penguins())
+        model = ols.build_model().fit(train[FEATURES], train[TARGET])
+        app = PredictionApp({"OLS": model}, train, {}, test=test)
+        point = pd.DataFrame([{key: control.value for key, control in app.controls.items()}])
+        axis_min = 500 * np.floor(train[TARGET].min() / 500)
+        span = 500 * np.ceil(train[TARGET].max() / 500) - axis_min
+        for level in (.90, .95):
+            app.level.value = level
+            app.predict_button.click()
+            mass, low, high = app.calibrated["OLS"].interval(point, level)
+            left, width = re.search(r'left:([.\d]+)%;width:([.\d]+)%', app.result.value).groups()
+            self.assertAlmostEqual(float(left), 100 * (low[0] - axis_min) / span, places=4)
+            self.assertAlmostEqual(float(width), 100 * (high[0] - low[0]) / span, places=4)
+            marker = re.search(r'<b style="left:([.\d]+)%', app.result.value).group(1)
+            self.assertAlmostEqual(float(marker), 100 * (mass[0] - axis_min) / span, places=4)
+            wide_w, wide_h = struct.unpack(">II", app.chart.value[16:24])
+            small_w, small_h = struct.unpack(">II", app.chart.compact[16:24])
+            self.assertLess(small_w / small_h, wide_w / wide_h)

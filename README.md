@@ -28,7 +28,7 @@ $labPython = "python"
 .\.venv\Scripts\python.exe -m jupyterlab source/lab01.ipynb
 ```
 
-Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và chạy **Kernel → Restart Kernel and Run All Cells**. Trong VS Code, mở notebook và chọn `.venv\Scripts\python.exe` làm kernel. Giao diện ở mục 5 cho phép dự đoán bằng các mô hình sẵn sàng, chỉnh đầu vào và xem xu hướng có điều kiện. Ô nhập số đi kèm từng thanh trượt. Trong bộ chọn **Biểu đồ**, có thể xem phân bố phần dư hoặc sai số tuyệt đối theo loài trên tập test. Mỗi hình có bảng số liệu. Chế độ so sánh hiển thị các mô hình trên cùng đầu vào. Ở chế độ benchmark, chọn OLS để xem CI cho trung bình và PI cho một cá thể. [Kịch bản demo Section 3.4](report/section-3-4-application.md) · [Ảnh và kiểm thử giao diện](report/ui-audit.md)
+Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và chạy **Kernel → Restart Kernel and Run All Cells**. Trong VS Code, mở notebook và chọn `.venv\Scripts\python.exe` làm kernel. Giao diện ở mục 5 cho phép dự đoán bằng các mô hình sẵn sàng, chỉnh đầu vào và xem xu hướng có điều kiện. Ô nhập số đi kèm từng thanh trượt. Dải kết quả hiển thị dự đoán và hai cận trên một thước gram. Chọn **Xu hướng**, **Phần dư** hoặc **Sai số theo loài** để đổi hình. Mỗi hình có bảng số liệu. Chế độ so sánh hiển thị các mô hình trên cùng đầu vào. Ở chế độ benchmark, chọn OLS để xem CI cho trung bình và PI cho một cá thể. [Kịch bản demo Section 3.4](report/section-3-4-application.md) · [Ảnh và kiểm thử giao diện](report/ui-audit.md)
 
 ## Phân công mô hình
 

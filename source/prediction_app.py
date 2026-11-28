@@ -2,6 +2,7 @@
 from base64 import b64encode
 from html import escape
 from pathlib import Path
+from math import ceil, floor, isfinite
 
 import anywidget
 import ipywidgets as widgets
@@ -22,7 +23,9 @@ SEX = {"female": "Cái", "male": "Đực"}
 
 class Measurement(anywidget.AnyWidget):
     _esm = ASSETS / "measurement.js"
-    _css = ASSETS / "panel.css"
+    _font = b64encode((ASSETS / "fonts/bricolage-600.woff2").read_bytes()).decode("ascii")
+    _css = (f"@font-face{{font-family:PalmerDisplay;src:url(data:font/woff2;base64,{_font}) "
+            "format('woff2');font-weight:600;font-display:swap}" + (ASSETS / "panel.css").read_text(encoding="utf-8"))
     description = traitlets.Unicode().tag(sync=True)
     min = traitlets.Float().tag(sync=True)
     max = traitlets.Float().tag(sync=True)
@@ -31,9 +34,16 @@ class Measurement(anywidget.AnyWidget):
     valid = traitlets.Bool(True).tag(sync=True)
 
 
+class FigurePicker(anywidget.AnyWidget):
+    _esm = ASSETS / "figure-picker.js"
+    options = traitlets.List().tag(sync=True)
+    value = traitlets.Unicode("trend").tag(sync=True)
+
+
 class Chart(anywidget.AnyWidget):
     _esm = ASSETS / "chart.js"
     value = traitlets.Bytes().tag(sync=True)
+    compact = traitlets.Bytes().tag(sync=True)
     description = traitlets.Unicode().tag(sync=True)
 
 
@@ -84,10 +94,10 @@ class PredictionApp:
         self.model_picker = widgets.Dropdown(description="Mô hình")
         self.feature_picker = widgets.Dropdown(
             options=[(labels.get(f, f), f) for f in FEATURES], description="Biến trên biểu đồ")
-        views = [("Xu hướng có điều kiện", "trend")]
+        views = [("Xu hướng", "trend")]
         if self.residuals:
-            views.extend([("Phân bố phần dư", "hist"), ("Sai số theo loài", "box")])
-        self.view = widgets.Dropdown(options=views, description="Biểu đồ")
+            views.extend([("Phần dư", "hist"), ("Sai số theo loài", "box")])
+        self.view = FigurePicker(options=views)
         self.compare = widgets.Checkbox(value=len(models) > 1 and not self.calibrated,
                                         description="So sánh các mô hình sẵn sàng", indent=False)
         self.predict_button = widgets.Button(description="Dự đoán")
@@ -109,27 +119,25 @@ class PredictionApp:
 
         art = b64encode((ASSETS / "palmer-penguins.png").read_bytes()).decode("ascii")
         header = widgets.HTML(
-            '<header class="pg-heading" lang="vi"><div><h2>Khối lượng chim cánh cụt</h2>'
-            '<p>Nhập số đo của một cá thể Palmer Penguins để ước lượng khối lượng và xem khoảng dự đoán.</p></div>'
+            '<header class="pg-heading" lang="vi"><div><h2 lang="en">Palmer Penguins</h2>'
+            '<p>Ước lượng khối lượng chim cánh cụt từ số đo hình thái, loài và giới tính.</p></div>'
             f'<figure><img src="data:image/png;base64,{art}" alt="Ba loài Chinstrap, Gentoo và Adelie">'
             '<figcaption><a href="https://allisonhorst.github.io/palmerpenguins/articles/art.html">'
             'Artwork by @allison_horst</a></figcaption></figure></header>')
+        jump = Result(value='<button type="button" class="pg-jump">Đọc kết quả dự đoán</button>')
         form = widgets.VBox([
             widgets.HTML("<h3>Cá thể khảo sát</h3>"),
             widgets.Box([self.controls["species"], self.controls["sex"]]).add_class("pg-pair"),
             *[self.controls[f] for f in self.numeric_features],
             widgets.HTML('<h3 class="pg-settings">Cấu hình dự đoán</h3>'),
             self.protocol, widgets.Box([self.model_picker, self.level]).add_class("pg-pair").add_class("pg-model-pair"),
-            self.predict_button,
+            self.compare, self.predict_button, jump.add_class("pg-jump-host"),
         ]).add_class("pg-form")
         self.figure_title = widgets.HTML("<h3>Xu hướng khối lượng</h3>")
         self.figure_panel = widgets.VBox([
-            self.figure_title,
-            widgets.Box([self.view, self.feature_picker]).add_class("pg-pickers"),
-            self.compare, self.chart, self.caption,
+            self.view, self.figure_title, self.feature_picker, self.chart, self.caption,
         ]).add_class("pg-view")
-        output = widgets.VBox([self.result, self.figure_panel]).add_class("pg-output")
-        self.panel = widgets.VBox([header, widgets.Box([form, output]).add_class("pg-layout")],
+        self.panel = widgets.VBox([header, self.result, widgets.Box([form, self.figure_panel]).add_class("pg-layout")],
                                   layout=widgets.Layout(width="100%", max_width="1140px", margin="0"))
         self.panel.add_class("penguin-panel")
         self.protocol.observe(self._change_protocol, names="value")
@@ -151,7 +159,8 @@ class PredictionApp:
         self._input_changed()
 
     def _show_notice(self, text):
-        self.result.value = f'<p class="pg-notice" lang="vi">{escape(text)}</p>'
+        self.result.value = (f'<section class="pg-notice" lang="vi"><h3>Khối lượng dự đoán</h3>'
+                             f'<p>{escape(text)}</p></section>')
         self.result.announcement = text
 
     def _input_changed(self, _change=None):
@@ -160,8 +169,7 @@ class PredictionApp:
         self.predict_button.description = "Dự đoán"
         self.rendered = False
         self.chart.value = b""
-        self.caption.value = ""
-        self.figure_panel.layout.display = "none"
+        self.caption.value = '<p class="pg-plot-placeholder" lang="vi">Biểu đồ chờ kết quả dự đoán.</p>'
         invalid = any(not self.controls[key].valid for key in self.numeric_features)
         self.predict_button.disabled = invalid or not self.models
         if not self.models:
@@ -234,8 +242,7 @@ class PredictionApp:
             self.caption.value = f'<div lang="vi" class="pg-caption">{caption}</div>'
             with self.chart.hold_sync():
                 self.chart.description = alt
-                self.chart.value = image
-            self.figure_panel.layout.display = ""
+                self.chart.value, self.chart.compact = image
             self.rendered = True
         except ValueError:
             if revision != self._revision:
@@ -248,6 +255,23 @@ class PredictionApp:
                 self.predict_button.description = "Dự đoán"
                 self.predict_button.disabled = False
 
+    def _interval_html(self, title, bounds, point):
+        low, high = bounds
+        numbers = f'<span class="pg-bounds">{number(low)} g đến {number(high)} g</span>'
+        if not all(isfinite(v) for v in bounds):
+            return f'<div class="pg-band">{title}{numbers}</div>'
+        # All models use the same graduated mass axis. Extend it for extrapolated limits.
+        axis_min = 500 * floor(min(self.train[TARGET].min(), low) / 500)
+        axis_max = max(axis_min + 500, 500 * ceil(max(self.train[TARGET].max(), high) / 500))
+        span = axis_max - axis_min
+        left = 100 * (low - axis_min) / span
+        width = 100 * (high - low) / span
+        mark = 100 * (point - axis_min) / span
+        return (f'<div class="pg-band"><div>{title}</div>{numbers}'
+                f'<div class="pg-track" aria-hidden="true"><i style="left:{left:.4f}%;width:{width:.4f}%"></i>'
+                f'<b style="left:{mark:.4f}%"></b></div><div class="pg-scale">'
+                f'<span>{number(axis_min, 0)} g</span><span>{number(axis_max, 0)} g</span></div></div>')
+
     def _result_html(self, name, point, estimate, support, info, bounds):
         safe_name = escape(name)
         prediction = number(estimate[name])
@@ -256,37 +280,38 @@ class PredictionApp:
         evidence = ""
         if bounds is not None:
             level = self.level.value
-            low, high = map(number, bounds)
-            band = (f'<div class="pg-band">Khoảng cá thể {level:.0%}<div class="pg-track" aria-hidden="true"></div>'
-                    f'<span class="pg-bounds"><b>{low} g</b><span class="pg-sr-only">đến</span><b>{high} g</b></span></div>')
-            evidence = (f'{info["n"] - info["outside"]}/{info["n"]} cá thể test nằm trong khoảng '
-                        f'({number(100 * info["coverage"])}%). Sai số tuyệt đối trung bình {number(info["MAE (g)"])} g.')
+            band = self._interval_html(f"Khoảng cá thể {level:.0%}", bounds, estimate[name])
+            evidence = (f'<div><dt>Bao phủ thực nghiệm</dt><dd>{number(100 * info["coverage"])}%'
+                        f'<small>{info["n"] - info["outside"]}/{info["n"]} cá thể test nằm trong khoảng</small></dd></div>')
             detail = (f'Mô hình học từ {len(support)} cá thể và hiệu chỉnh trên {len(self.train) - len(support)} cá thể khác. '
                       f'Mức {level:.0%} là mục tiêu bao phủ chung cho các cá thể có thể trao đổi được. '
                       f'Độ rộng {number(info["width_g"])} g cố định với mô hình và mức đã chọn. '
                       f'Tỷ lệ quan sát dùng {info["n"]} mẫu test, có thể khác giữa các loài.')
         else:
-            if info is not None:
-                evidence = f'Sai số tuyệt đối trung bình {number(info["MAE (g)"])} g trên {len(self.test)} cá thể test.'
             detail = f'Chế độ benchmark sử dụng toàn bộ {len(support)} mẫu train.'
             if name == "OLS":
                 row = ols_prediction_intervals(self.models[name], self.ols_inference, point).iloc[0]
-                band = (f'<div class="pg-band">PI 95% cho cá thể<div class="pg-track" aria-hidden="true"></div>'
-                        f'<span class="pg-bounds"><b>{number(row.obs_ci_lower)} g</b><span class="pg-sr-only">đến</span>'
-                        f'<b>{number(row.obs_ci_upper)} g</b></span></div>')
-                evidence += (f' CI 95% cho trung bình từ {number(row.mean_ci_lower)} đến {number(row.mean_ci_upper)} g.')
+                band = self._interval_html("PI 95% cho cá thể", (row.obs_ci_lower, row.obs_ci_upper), estimate[name])
+                evidence = (f'<div><dt>CI 95% cho trung bình</dt><dd>{number(row.mean_ci_lower)} '
+                            f'đến {number(row.mean_ci_upper)} g</dd></div>')
                 detail += ' PI cổ điển gồm thêm phương sai của cá thể mới và dựa trên giả định OLS.'
             elif self.calibrated:
                 detail += ' Chọn chế độ dự đoán cá thể để xem khoảng conformal.'
-        result = (f'<section class="pg-answer" lang="vi"><h3>{safe_name} · khối lượng dự đoán</h3>'
-                  f'<div class="pg-values"><strong class="pg-mass">{prediction} g</strong>{band}</div>')
-        if evidence:
-            result += f'<div class="pg-evidence">{evidence}</div>'
+        if info is not None:
+            evidence += (f'<div><dt>Sai số tuyệt đối trung bình</dt><dd>{number(info["MAE (g)"])} g'
+                         f'<small>Trên {len(self.test)} cá thể test</small></dd></div>')
+        species = point["species"].iloc[0]
+        sex = point["sex"].iloc[0]
+        result = (f'<section class="pg-answer" lang="vi"><div class="pg-readout"><div class="pg-point">'
+                  f'<h3 tabindex="-1">{safe_name} · khối lượng dự đoán</h3>'
+                  f'<strong class="pg-mass">{prediction} g</strong>'
+                  f'<span>{escape(species)} · {escape(SEX.get(sex, sex))}</span></div>{band}'
+                  f'<dl class="pg-evidence">{evidence}</dl></div>')
         if len(estimate) > 1:
             other = " · ".join(f"{escape(n)} {number(v)} g" for n, v in estimate.items() if n != name)
             result += f'<p class="pg-alternatives">Cùng đầu vào · {other}</p>'
-        result += f'<details><summary>Cách đọc kết quả</summary>{detail}</details></section>'
-        species = point["species"].iloc[0]
+        result += (f'<div class="pg-reading"><details><summary>Cách đọc kết quả</summary>{detail}</details>'
+                   '<button type="button" class="pg-jump" data-target="chart">Xem biểu đồ</button></div></section>')
         group = support.loc[support.species.eq(species)]
         outside = [escape(self.labels.get(k, k)) for k in self.numeric_features
                    if not group[k].min() <= point[k].iloc[0] <= group[k].max()]
