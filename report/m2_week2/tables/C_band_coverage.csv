@@ -1,0 +1,4 @@
+biến,tỷ lệ điểm p5–p95 mà đường OLS nằm trong dải CI95 của M2,|M2 − OLS| lớn nhất trong p5–p95 (g),"nửa bề rộng dải CI95 M2, trung bình (g)"
+flipper_length_mm,1.0,268.7882167651801,240.16778644440836
+bill_length_mm,1.0,62.573265031402116,181.1339634692702
+bill_depth_mm,1.0,105.19839448006041,229.91512919573333
