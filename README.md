@@ -28,7 +28,16 @@ $labPython = "python"
 .\.venv\Scripts\python.exe -m jupyterlab source/lab01.ipynb
 ```
 
-Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và chạy **Kernel → Restart Kernel and Run All Cells**. Trong VS Code, mở notebook và chọn `.venv\Scripts\python.exe` làm kernel. Giao diện ở mục 5 cho phép dự đoán bằng các mô hình sẵn sàng, chỉnh đầu vào và xem xu hướng có điều kiện. Ô nhập số đi kèm từng thanh trượt. Dải kết quả hiển thị dự đoán và hai cận trên một thước gram. Chọn **Xu hướng**, **Phần dư** hoặc **Sai số theo loài** để đổi hình. Mỗi hình có bảng số liệu. Chế độ so sánh hiển thị các mô hình trên cùng đầu vào. Ở chế độ benchmark, chọn OLS để xem CI cho trung bình và PI cho một cá thể. [Kịch bản demo Section 3.4](report/section-3-4-application.md) · [Ảnh và kiểm thử giao diện](report/ui-audit.md)
+Trong JupyterLab, chọn kernel Python của môi trường vừa tạo và chạy **Kernel → Restart Kernel and Run All Cells**. Trong VS Code, mở notebook và chọn `.venv\Scripts\python.exe` làm kernel. Ở mục 5, chọn **Cá thể mẫu** hoặc nhập ba số đo, loài và giới tính, rồi bấm **Dự đoán**. Bốn khu vực dùng chung đầu vào và mô hình.
+
+| Khu vực | Có thể đọc gì? |
+| --- | --- |
+| Dự đoán cá thể | Khối lượng và khoảng dự đoán, xu hướng có điều kiện, phần dư, sai số theo loài và thực tế so với dự đoán. |
+| So sánh mô hình | Bốn khoảng conformal trên cùng thước gram. Đổi sang Benchmark để xem ΔMAE, CI bootstrap, chỉ số test và CV. |
+| Kiểm chứng khoảng | Cận, dự đoán và khối lượng thật của 69 cá thể. So sánh độ bao phủ và độ rộng ở hai mức 90% và 95%. |
+| Phương pháp | Bảy bước tách tập, fit, hiệu chỉnh và kiểm chứng. Mở bảng để đọc 55 sai số đã xếp hạng. |
+
+**Khôi phục mặc định** đưa toàn bộ ứng dụng về ví dụ OLS ban đầu. Các hình có mô tả và bảng đọc được bằng bàn phím. Giữ `report/comparison.json` trong bản bàn giao để hiện CV và bootstrap đã đối chiếu. [Demo hai phút](report/section-3-4-application.md#demo-hai-phút) · [Ảnh và nghiệm thu](report/ui-audit.md)
 
 ## Phân công mô hình
 

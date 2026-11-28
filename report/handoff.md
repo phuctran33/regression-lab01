@@ -53,7 +53,7 @@ python -m source.check_week2 --notebook
 
 Python 3.12.15, chín dependency ghim trong requirements, gồm anywidget cho phần nhập số và biểu đồ trong JupyterLab. Kết quả đối chiếu dùng checkout tách biệt và môi trường sạch. Các phép so sánh giữ ID hàng và thứ tự. Tệp JSON lưu toàn bộ ID test, proper train, calibration và năm validation fold ngoài. Kiểm thử theo dõi cả các fit lồng trong GridSearchCV, kiểm tra đúng predictor cho hai cận, định hạng 51/54 và trường hợp phải trả bán kính vô hạn. Cờ `--details` cũng thực thi diagnostics của Ridge. [Runner thống nhất](../source/analysis/comparison.py)
 
-**Kết quả thực chạy.** `pip check`, compile và import đạt. 29/29 unit test đạt. Bốn CLI tạo dự đoán hữu hạn, M3 hội tụ 35/35 lượt trên lưới train. Tái tạo byte-for-byte JSON benchmark/nested/conformal, log và artifact M2 và ba hình OLS/M3. Mười CSV của Ridge khớp trong sai số số học. Cả 69 ID và dự đoán OLS/M1 khớp bảng tác giả. Notebook chạy toàn bộ cell và kiểm tra cả hai chế độ của widget. `source.check_week2 --notebook` trả mã 1 với đúng hai mục `m4_configured` và `five_real_models_in_app`. M4 vẫn là placeholder. Nhánh Phúc, Issue #10, dữ liệu, pipeline chia tập và năm cell EDA tuần 1 (kể cả output) được giữ nguyên.
+**Kết quả thực chạy.** `pip check`, compile và import đạt. 32/32 unit test đạt. Bốn CLI tạo dự đoán hữu hạn, M3 hội tụ 35/35 lượt trên lưới train. Tái tạo byte-for-byte JSON benchmark/nested/conformal, log và artifact M2 và ba hình OLS/M3. Mười CSV của Ridge khớp trong sai số số học. Cả 69 ID và dự đoán OLS/M1 khớp bảng tác giả. Notebook chạy toàn bộ cell và kiểm tra cả hai chế độ của widget. `source.check_week2 --notebook` trả mã 1 với đúng hai mục `m4_configured` và `five_real_models_in_app`. M4 vẫn là placeholder. Nhánh Phúc, Issue #10, dữ liệu, pipeline chia tập và năm cell EDA tuần 1 (kể cả output) được giữ nguyên.
 
 Để xuất lại PDF dự thảo từ Markdown, dùng Pandoc và XeLaTeX trong thư mục `report/` (hai công cụ soạn thảo nằm ngoài môi trường chạy notebook).
 
@@ -63,7 +63,7 @@ pandoc integration.md -o integration.pdf --pdf-engine=xelatex -V mainfont='Times
 
 ### Kiểm thử giao diện và giới hạn
 
-Giao diện mục 5 đã được kiểm tra bằng Chrome trên JupyterLab. Báo cáo giao diện ghi ảnh trước/sau, kết quả axe theo trạng thái, thao tác bàn phím, kích thước đã thử và các giới hạn. [Nghiệm thu giao diện](ui-audit.md)
+Giao diện mục 5 đã được kiểm tra trong JupyterLab bằng Chrome, Chromium và Firefox. Nghiệm thu bao gồm bốn vùng dùng chung đầu vào, so sánh benchmark/conformal, 69 hàng test và quy trình hiệu chỉnh. Báo cáo giao diện ghi ảnh trước/sau, kết quả axe theo trạng thái, thao tác bàn phím, kích thước đã thử và các giới hạn. [Nghiệm thu giao diện](ui-audit.md)
 
 ### Lần tích hợp tiếp theo
 

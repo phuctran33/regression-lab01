@@ -85,11 +85,17 @@ Bảo đảm conformal là bao phủ biên khi calibration và cá thể mới t
 
 ## 3.4. Ứng dụng
 
-Người dùng chọn một trong bốn mô hình, nhập ba số đo và hai thuộc tính phân loại. Chế độ mặc định hiển thị dự đoán cùng khoảng cho cá thể, sai số MAE và số cá thể test nằm trong khoảng của chính predictor đó. Trên thước gram, hình thoi đánh dấu dự đoán điểm và đoạn sáng thể hiện độ rộng khoảng. Với OLS mặc định, khi chuyển từ 95% xuống 90%, độ rộng giảm từ 1.272,58 g xuống 1.164,93 g. Hai mức dùng cùng thước từ 2.500 g đến 6.500 g. Bên cạnh thước là tỷ lệ bao phủ thực nghiệm và MAE trên tập test. Chế độ benchmark gọi mô hình fit toàn bộ train, cho phép đọc CI và PI cổ điển của OLS. Nút so sánh giữ cả đầu vào và protocol đồng nhất. Biểu đồ thay một đầu vào và giữ bốn đầu vào còn lại. Các chấm nền là cá thể quan sát với những tổ hợp đầu vào khác nhau.
+Người dùng chọn một trong bốn mô hình, nhập ba số đo và hai thuộc tính phân loại. Chế độ mặc định hiển thị dự đoán cùng khoảng cho cá thể, sai số MAE và số cá thể test nằm trong khoảng của chính predictor đó. Trên thước gram, hình thoi đánh dấu dự đoán điểm và đoạn sáng thể hiện độ rộng khoảng. Với OLS mặc định, khi chuyển từ 95% xuống 90%, độ rộng giảm từ 1.272,58 g xuống 1.164,93 g. Hai mức dùng cùng thước từ 2.500 g đến 6.500 g. Bên cạnh thước là tỷ lệ bao phủ thực nghiệm và MAE trên tập test. Chế độ benchmark gọi mô hình fit toàn bộ train, cho phép đọc CI và PI cổ điển của OLS. Mục So sánh mô hình đặt bốn khoảng trên một trục gram cho cùng đầu vào. Ở chế độ benchmark, mục này hiển thị ΔMAE so với OLS, CI bootstrap và hai quy trình CV. Biểu đồ thay một đầu vào và giữ bốn đầu vào còn lại. Các chấm nền là cá thể quan sát với những tổ hợp đầu vào khác nhau.
 
-![Giao diện dự đoán và khoảng cá thể thực tế trong JupyterLab.](figures/prediction-dashboard.png)
+![Giao diện dự đoán trong cửa sổ JupyterLab.](figures/application/viewport-1366.png)
+*Giao diện trên laptop. Khối lượng, hai cận và số mẫu bao phủ nằm ngay dưới các điều khiển.*
 
-Thanh trượt và ô nhập số dùng giới hạn của train. Histogram thể hiện phần dư có dấu (thực tế trừ dự đoán). Boxplot so sánh độ lớn sai số theo loài. Hai hình và các bảng đi kèm dùng cùng 69 cá thể test và đúng predictor của chế độ đang chọn. Nếu một số đo ngoài miền train của loài, giao diện ghi tên số đo cần thận trọng. Tổ hợp đầu vào vẫn có thể hiếm ngay cả khi từng số đo nằm trong miền. Xem [kịch bản demo và cách đọc kết quả](section-3-4-application.md).
+Từ **Kiểm chứng khoảng**, người xem có thể đọc hai cận, dự đoán và khối lượng thật theo ID. Với M2, khi chuyển từ 90% lên 95%, số cá thể trong dải tăng từ 62 lên 68 trên cùng 69 cá thể, với độ rộng tăng 343,92 g. **Phương pháp** cho thấy chính sự thay đổi từ sai số hiệu chỉnh thứ 51 lên thứ 54 tạo ra hai khoảng này. Năm cá thể mẫu lấy từ train giúp bắt đầu demo nhanh. Nút khôi phục đưa mô hình, đầu vào và kết quả về cùng mặc định.
+
+![Dải khoảng dự đoán trên 69 cá thể.](figures/application/test-plot.png)
+*M2 ở mức 90%. Bảy dấu × nằm ngoài dải khi sắp xếp 69 cá thể test theo dự đoán tăng dần.*
+
+Thanh trượt và ô nhập số dùng giới hạn của train. Histogram thể hiện phần dư có dấu (thực tế trừ dự đoán). Boxplot so sánh độ lớn sai số theo loài. Đồ thị thực tế so với dự đoán dùng đường tham chiếu y = x. Ba hình và các bảng đi kèm dùng cùng 69 cá thể test và đúng predictor của chế độ đang chọn. Nếu một số đo ngoài miền train của loài, giao diện ghi tên số đo cần thận trọng. Tổ hợp đầu vào vẫn có thể hiếm ngay cả khi từng số đo nằm trong miền. Xem [kịch bản demo và cách đọc kết quả](section-3-4-application.md).
 
 ## Kết luận trong phạm vi ba thành viên
 
