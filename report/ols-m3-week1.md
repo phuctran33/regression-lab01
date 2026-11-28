@@ -2,6 +2,8 @@
 
 Nguyễn Đức Hưng (TV3) · Lab 01 · 20/11/2026
 
+Bản ghi tuần 1 giữ lưới λ ban đầu và kết quả bàn giao lúc đó. Lưới mở rộng tuần 2, kiểm định chung cho loài và ví dụ CI/PI nằm trong phần đánh giá cập nhật. [Section 3.3](section-3-3-evaluation.md)
+
 OLS là baseline tuyến tính để xem ba số đo, loài và giới tính dự đoán khối lượng tốt đến đâu với hệ số dễ diễn giải. M3 dùng ba hàm làm mượt riêng để cho phép độ dốc thay đổi theo kích thước. Trên tập test của tuần 1, hai mô hình có sai số gần bằng nhau.
 
 ## Dữ liệu và tiền xử lý
@@ -47,7 +49,7 @@ Trục ngang hiển thị số đo gốc theo mm. Trục dọc hiển thị đó
 
 ## Chạy lại
 
-Từ thư mục gốc, mở môi trường Python 3.11 hoặc 3.12 theo hướng dẫn của repo rồi chạy các lệnh sau. Lệnh `--select-lam` chạy riêng CV trên train. [Thiết lập môi trường](../README.md#chạy-notebook)
+Từ thư mục gốc, mở môi trường Python 3.11 hoặc 3.12 theo hướng dẫn của repo rồi chạy các lệnh sau. Lệnh `--select-lam` chạy riêng CV trên train. Bản cập nhật tuần 2 in thêm ba ứng viên trên 100. [Thiết lập môi trường](../README.md#chạy-notebook)
 
 ```bash
 python -m pip install -r requirements.txt

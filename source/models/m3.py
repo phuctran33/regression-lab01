@@ -5,7 +5,7 @@ import numpy as np
 from scipy.interpolate import make_smoothing_spline
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.exceptions import ConvergenceWarning
-from sklearn.model_selection import GridSearchCV, KFold
+from sklearn.model_selection import KFold, cross_validate
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 from ..modeling import (
@@ -20,7 +20,7 @@ from ..modeling import (
 
 NAME = "M3"
 SMOOTH_FEATURES = ("flipper_length_mm", "bill_length_mm", "bill_depth_mm")
-LAMBDA_CANDIDATES = (0.1, 1.0, 10.0, 100.0)
+LAMBDA_CANDIDATES = (0.1, 1.0, 10.0, 100.0, 300.0, 1000.0, 3000.0)
 
 
 class AdditiveSmoothingSpline(RegressorMixin, BaseEstimator):
@@ -80,10 +80,11 @@ class AdditiveSmoothingSpline(RegressorMixin, BaseEstimator):
             )
             if change <= self.tol:
                 break
-        else:
-            warn("Additive smoothing spline backfitting reached max_iter.", ConvergenceWarning, stacklevel=2)
-
         self.n_iter_ = n_iter
+        self.max_change_ = change
+        self.converged_ = bool(change <= self.tol)
+        if not self.converged_:
+            warn("Additive smoothing spline backfitting reached max_iter.", ConvergenceWarning, stacklevel=2)
         self.intercept_ = coefficients[0]
         self.linear_indices_ = linear_indices
         self.linear_coef_ = coefficients[1:]
@@ -120,18 +121,25 @@ def build_model():
 
 def select_lambda():
     train, _ = split_penguins(load_penguins())
-    search = GridSearchCV(
-        build_model(),
-        {"regression__lam": LAMBDA_CANDIDATES},
-        cv=KFold(n_splits=5, shuffle=True, random_state=42),
-        scoring="neg_mean_absolute_error",
-        refit=False,
-        error_score="raise",
-    )
-    search.fit(train[FEATURES], train[TARGET])
-    for lam, score in zip(LAMBDA_CANDIDATES, search.cv_results_["mean_test_score"]):
-        print(f"λ = {lam:g} | MAE CV (g) = {-score:.3f}")
-    print(f"λ được chọn = {search.best_params_['regression__lam']:g}")
+    cv = KFold(n_splits=5, shuffle=True, random_state=42)
+    converged_scores = {}
+    for lam in LAMBDA_CANDIDATES:
+        result = cross_validate(
+            build_model().set_params(regression__lam=lam), train[FEATURES], train[TARGET],
+            cv=cv, scoring="neg_mean_absolute_error", return_estimator=True, error_score="raise",
+        )
+        errors = -result["test_score"]
+        fits = [model.named_steps["regression"] for model in result["estimator"]]
+        n_converged = sum(fit.converged_ for fit in fits)
+        if n_converged == len(fits):
+            converged_scores[lam] = errors.mean()
+        print(
+            f"λ = {lam:g} | MAE CV (g) = {errors.mean():.3f} ± {errors.std(ddof=1):.3f} | "
+            f"Hội tụ {n_converged}/{len(fits)} | Số vòng {[fit.n_iter_ for fit in fits]}"
+        )
+    if not converged_scores:
+        raise RuntimeError("No lambda converged in all training folds.")
+    print(f"λ được chọn = {min(converged_scores, key=converged_scores.get):g}")
 
 
 if __name__ == "__main__":

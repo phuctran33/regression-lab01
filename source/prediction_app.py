@@ -8,11 +8,15 @@ import numpy as np
 import pandas as pd
 from matplotlib.figure import Figure
 
+from .evaluation import fit_ols_inference, ols_prediction_intervals
 from .modeling import CATEGORICAL, FEATURES, TARGET
 
 MODEL_STYLES = {
     "OLS": {"color": "#a54c20", "linestyle": "--", "marker": "s"},
+    "M1": {"color": "#5b3a83", "linestyle": "-.", "marker": "^"},
+    "M2": {"color": "#19754c", "linestyle": ":", "marker": "o"},
     "M3": {"color": "#156581", "linestyle": "-", "marker": "D"},
+    "M4": {"color": "#871f52", "linestyle": (0, (5, 2, 1, 2, 1, 2)), "marker": "P"},
 }
 
 
@@ -21,6 +25,8 @@ class PredictionApp:
         self.models = models
         self.train = train
         self.labels = labels
+        self.numeric_features = [feature for feature in FEATURES if feature not in CATEGORICAL]
+        self.ols_inference = fit_ols_inference(models["OLS"], train)[0] if "OLS" in models else None
         style = {"description_width": "initial"}
         self.model_picker = widgets.Dropdown(
             options=list(models), description="Mô hình", style=style,
@@ -29,9 +35,10 @@ class PredictionApp:
             options=[(labels.get(feature, feature), feature) for feature in FEATURES],
             description="Biến trên biểu đồ", style=style,
         )
-        can_compare = {"OLS", "M3"}.issubset(models)
+        can_compare = len(models) > 1
         self.compare = widgets.Checkbox(
-            value=can_compare, disabled=not can_compare, description="So sánh OLS và M3", indent=False,
+            value=can_compare, disabled=not can_compare, description="So sánh các mô hình sẵn sàng",
+            indent=False, layout=widgets.Layout(width="auto"),
         )
         self.predict_button = widgets.Button(
             description="Dự đoán", button_style="primary", disabled=not models,
@@ -84,10 +91,15 @@ class PredictionApp:
             feature = self.feature_picker.value
             if name not in self.models or feature not in self.controls:
                 raise ValueError("Model or feature is unavailable.")
-            point = pd.DataFrame([{key: widget.value for key, widget in self.controls.items()}])
+            inputs = {key: widget.value for key, widget in self.controls.items()}
+            if any(inputs[key] not in self.controls[key].options for key in FEATURES if key in CATEGORICAL):
+                raise ValueError("A categorical input is missing or unavailable.")
+            point = pd.DataFrame([inputs])
+            if not np.isfinite(point[self.numeric_features].to_numpy(dtype=float)).all():
+                raise ValueError("A numeric input is not finite.")
             names = [name]
             if self.compare.value:
-                names.extend(model for model in ("OLS", "M3") if model != name and model in self.models)
+                names.extend(model for model in self.models if model != name)
             focus = self.controls[feature]
             categorical = feature in CATEGORICAL
             if categorical:
@@ -101,10 +113,26 @@ class PredictionApp:
             trends = {model: self.models[model].predict(scenarios) for model in names}
             if not np.isfinite(list(estimate.values())).all() or not np.isfinite(list(trends.values())).all():
                 raise ValueError("The model returned a non-finite prediction.")
-            self.chart.value = self._plot(name, feature, point, values, estimate, trends)
             selected = f'<strong>{escape(name)} · body_mass_g = {estimate[name]:,.1f} g</strong>'
             alternatives = [f"{escape(model)} {estimate[model]:,.1f} g" for model in names[1:]]
-            self._message(" · ".join([selected, *alternatives]))
+            messages = [" · ".join([selected, *alternatives])]
+            if name == "OLS":
+                intervals = ols_prediction_intervals(self.models[name], self.ols_inference, point).iloc[0]
+                messages.append(
+                    f"OLS cổ điển · CI 95% cho trung bình [{intervals.mean_ci_lower:,.1f} đến "
+                    f"{intervals.mean_ci_upper:,.1f}] g · PI 95% cho cá thể [{intervals.obs_ci_lower:,.1f} đến "
+                    f"{intervals.obs_ci_upper:,.1f}] g"
+                )
+            species = inputs["species"]
+            measured = self.train.loc[self.train["species"].eq(species), self.numeric_features]
+            outside = [
+                escape(self.labels.get(key, key)) for key in self.numeric_features
+                if inputs[key] < measured[key].min() or inputs[key] > measured[key].max()
+            ]
+            if outside:
+                messages.append(f"Ngoài khoảng train của loài {escape(species)} · {', '.join(outside)}.")
+            self.chart.value = self._plot(name, feature, point, values, estimate, trends)
+            self._message("<br>".join(messages))
         except ValueError:
             self.chart.value = b""
             self._message("Không thể dự đoán. Hãy chọn mô hình và kiểm tra các giá trị đầu vào.")
