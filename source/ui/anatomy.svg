@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 370 162" role="group" aria-label="Sơ đồ vị trí ba phép đo. Chọn một đường đo để sửa giá trị.">
+  <!-- Original Lab 01 schematic, CC BY 4.0. Measurement and identification references are in report/section-3-4-application.md. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 144Q62 139 113 144T145 144" fill="none" stroke="#b8beaa"/>
+    <path d="M77 133l-3 8-12 4 19-1 6-7m4-4 1 10 16 1-11-6" fill="#cb9871" stroke="#735d4a" stroke-width="1.2"/>
+    <path d="M84 22C94 10 113 14 120 24L128 31l16 5-17 5c-13 2-17 12-17 23 4 22 3 42-7 59-7 12-17 18-28 15-9-2-17-4-26-1l-15 2 10-17c7-12 8-32 16-53 5-15 15-25 24-38z" fill="#344440" stroke="#243632" stroke-width="1.6"/>
+    <path d="M114 39c-2 8-9 12-9 25q11 35-5 59-10 15-25 12c-2-15 9-36 10-55 0-12 1-22 8-31z" fill="#fff9e8"/>
+    <path d="M84 24c7-13 27-15 36 0l8 8-8 9-18 7-13 8-10-4z" fill="#25322f"/>
+    <g class="pg-chinstrap"><path d="M85 37q11-8 28-6l12 4q-6 12-16 14l-14 8-13-7z" fill="#fcf7e9"/><path d="M87 38q1 10 13 14l8-3" fill="none" stroke="#283531" stroke-width="2.8"/></g>
+    <path class="pg-gentoo" d="M92 23q7-6 17-3l6 8-8 7-9-4z" fill="#fff8e9"/>
+    <path class="pg-bill" d="M119 30q8 0 22 5l4 2-6 3-18-1-4-4z" stroke="#323d36" stroke-width=".85"/>
+    <path d="m119 35 21 2" stroke="#5d4935" fill="none"/>
+    <circle cx="111" cy="30" r="2.45" fill="#262e2a" stroke="#baa38a" stroke-width=".9"/>
+    <circle class="pg-adelie" cx="111" cy="30" r="3.2" fill="none" stroke="ivory" stroke-width="1.25"/>
+    <path d="M83 60C75 64 70 73 61 84c-7 8-12 16-22 28 2-1 12-5 19-10l15-13 15-19q5-9-1-11z" fill="#52625a" stroke="#2a3e38" stroke-width="1.6"/>
+    <path d="M83 66q-16 22-35 38m4 16-4 10m48-56q5 21 0 35" fill="none" stroke="#88958a" stroke-width="1.1"/>
+    <path d="M146 36q17 1 29 16" stroke="#a5ada2" stroke-dasharray="2 4" fill="none"/>
+    <path d="M174 52q13-24 30-23 21-1 39 17l12 11 28 5q26 2 49 16-2 5-11 7-30 6-67 2-15 3-25 14l-10 12-25-6q8-29-20-55z" fill="#32423e" stroke="#243633" stroke-width="1.4"/>
+    <path d="M180 76q24 8 38 10t35-1l-23 16-11 12-25-6z" fill="#faf6e6"/>
+    <path class="pg-chinstrap" d="M185 58q16-11 45-3l19 8 9 5-4 16-24 16-30-8z" fill="#fbf7e9"/>
+    <path class="pg-chinstrap" d="M190 64q8 24 33 35l11-2" fill="none" stroke="#293b35" stroke-width="4"/>
+    <path class="pg-gentoo" d="M192 36q12-4 21 0l14 15-9 14-13-3z" fill="#faf6e7"/>
+    <circle cx="229" cy="61" r="4.7" fill="#252c28" stroke="#a98e66" stroke-width="1.5"/>
+    <circle class="pg-adelie" cx="229" cy="61" r="6.4" stroke="ivory" stroke-width="2.3" fill="none"/>
+    <path class="pg-bill" d="M254 57q43 2 78 21-3 5-12 7-36 5-65 1l-10-13z" stroke="#354038" stroke-width="1.2"/>
+    <path d="M248 74q31 3 78 5" fill="none" stroke="#544d3d"/>
+    <g data-measure="flipper_length_mm" role="button" tabindex="0" aria-label="Sửa chiều dài cánh bơi">
+      <rect class="pg-target" x="10" y="31" width="74" height="83" rx="4"/>
+      <path class="pg-hit" d="m34 105 42-52"/><path class="pg-rule" d="m34 105 42-52m-45 49 7 6m35-58 7 6"/>
+      <text x="12" y="47">Cánh bơi</text>
+    </g>
+    <g data-measure="bill_length_mm" role="button" tabindex="0" aria-label="Sửa chiều dài mỏ">
+      <rect class="pg-target" x="248" y="16" width="95" height="45" rx="4"/>
+      <path class="pg-hit" d="m258 41 77 19"/><path class="pg-rule" d="m258 41 77 19m-78-14 2-10m74 29 3-10"/>
+      <path class="pg-guide" d="m255 54 3-13m74 34 3-15"/><text x="271" y="34">Dài mỏ</text>
+    </g>
+    <g data-measure="bill_depth_mm" role="button" tabindex="0" aria-label="Sửa độ sâu mỏ">
+      <rect class="pg-target" x="298" y="62" width="70" height="55" rx="4"/>
+      <path class="pg-hit" d="M348 57v30"/><path class="pg-rule" d="M348 57v30m-5-30h10m-10 30h10"/>
+      <path class="pg-guide" d="M256 57h92m-92 30h92"/><text x="305" y="108">Sâu mỏ</text>
+    </g>
+  </g>
+</svg>

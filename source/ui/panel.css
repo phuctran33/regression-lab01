@@ -21,7 +21,7 @@
 .penguin-panel .pg-specimen a:hover small {text-decoration:underline}
 .penguin-panel .pg-specimen img {display:block; height:40px; width:100%; object-fit:contain; mix-blend-mode:multiply}
 .penguin-panel .pg-specimen small {font:inherit}
-.penguin-panel .pg-answer,.penguin-panel .pg-notice {padding:20px var(--gutter) 14px; background:linear-gradient(108deg,var(--result) 25%,#1e4543 70%,#204643); color:#fff; font-variant-numeric:tabular-nums}
+.penguin-panel .pg-answer,.penguin-panel .pg-notice {padding:20px var(--gutter) 14px; background:var(--result); color:#fff; font-variant-numeric:tabular-nums}
 .penguin-panel .pg-readout {display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(0,1fr); align-items:center; gap:clamp(16px,3cqw,40px)}
 .penguin-panel .pg-point {display:grid; gap:3px}
 .penguin-panel .pg-point h3,.penguin-panel .pg-band > div:first-child,.penguin-panel .pg-evidence dt {font:600 13px/1.35 system-ui,sans-serif; color:#d9e8df}
@@ -51,7 +51,7 @@
 .penguin-panel .pg-plot-placeholder {padding:24px 16px; background:var(--ice); border-left:3px solid var(--edge); color:var(--muted)}
 .penguin-panel .pg-layout {display:grid; grid-template-columns:minmax(268px,30%) minmax(0,1fr); align-items:start}
 .penguin-panel .pg-form,.penguin-panel .pg-view {min-width:0; padding:22px var(--gutter); gap:12px; align-items:stretch}
-.penguin-panel .pg-form {background:linear-gradient(145deg,#f2f5ec,#ebf3ef); align-self:stretch; border-right:1px solid var(--rule)}
+.penguin-panel .pg-form {background:#eff4ed; align-self:stretch; border-right:1px solid var(--rule)}
 .penguin-panel .pg-form h3,.penguin-panel .pg-view h3 {font:600 23px/1.15 var(--display); letter-spacing:-.025em}
 .penguin-panel .pg-form .pg-settings {padding-top:14px; margin-top:3px; border-top:1px solid var(--rule)}
 .penguin-panel .pg-pair {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space)}
@@ -167,3 +167,111 @@
   .penguin-panel .pg-nav .pg-views {gap:0 12px}
   .penguin-panel .pg-nav label {font-size:13px}
 }
+/* Reading spread: measurements on the left, inference and its evidence on the right. */
+.penguin-panel .pg-heading {min-height:90px; padding-block:10px}
+.penguin-panel .pg-heading h2 {font-size:clamp(35px,4.6cqw,53px)}
+.penguin-panel .pg-layout {grid-template-columns:minmax(285px,32%) minmax(0,1fr); grid-template-areas:"form answer" "form chart"; grid-template-rows:auto 1fr}
+.penguin-panel .pg-form {grid-area:form; gap:9px; padding:17px clamp(14px,1.8cqw,23px)}
+.penguin-panel .pg-summary {grid-area:answer; min-width:0}
+.penguin-panel .pg-view {grid-area:chart}
+.penguin-panel .pg-answer,.penguin-panel .pg-notice {padding:16px clamp(15px,2cqw,25px) 10px}
+.penguin-panel .pg-readout {grid-template-columns:1.05fr 1.2fr; gap:13px}
+.penguin-panel .pg-evidence {display:flex; flex-wrap:wrap; gap:8px 24px; border:0; padding:9px 0 0; border-top:1px solid #66837a; grid-column:1/-1}
+.penguin-panel .pg-evidence dd {font:600 17px/1.3 system-ui,sans-serif; font-variant-numeric:tabular-nums}
+.penguin-panel .pg-evidence small {display:inline; margin-left:6px}
+.penguin-panel .pg-point .pg-mass {font:550 clamp(34px,4.25cqw,53px)/1.12 system-ui,sans-serif; letter-spacing:0; font-variant-numeric:tabular-nums}
+.penguin-panel .pg-mass small {font:450 .48em/1 system-ui,sans-serif; color:#d1e3d8}
+.penguin-panel .pg-reading {align-items:baseline; gap:8px 15px; flex-wrap:wrap}
+.penguin-panel .pg-export,.penguin-panel .pg-edit,.penguin-panel .pg-reading .pg-jump {background:transparent; color:#fff3cd; padding:4px; font:600 13px/1.4 system-ui,sans-serif; text-decoration:underline; text-underline-offset:3px; border:0; cursor:pointer}
+.penguin-panel .pg-export {margin-inline-start:auto}
+.penguin-panel .pg-context {display:flex; align-items:baseline; flex-wrap:wrap; gap:4px 15px; padding-block:9px}
+.penguin-panel .pg-context h3 {display:inline; margin-inline-end:14px; color:#fff1cd; font:650 15px/1.4 system-ui,sans-serif}
+.penguin-panel .pg-context .pg-mass {font:650 16px/1.4 system-ui,sans-serif; letter-spacing:0}
+.penguin-panel .pg-context .pg-mass small {font-size:.85em}
+.penguin-panel .pg-context .pg-reading {border:0; margin:0 0 0 auto; padding:0}
+.penguin-panel .pg-jump-host .pg-jump {color:#165750; background:transparent}
+.penguin-panel .pg-form-predict {background:white; color:var(--action); border:1px solid var(--edge); min-height:34px}
+.penguin-panel .pg-form-predict:hover:not(:disabled) {background:#ddebe2}
+.penguin-panel .pg-atlas {border-block:1px solid #b8c5b7; padding:10px 0; margin-top:4px}
+.penguin-panel .pg-atlas figcaption {display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 8px; color:var(--ink)}
+.penguin-panel .pg-atlas strong {font:600 19px/1.2 var(--display)}
+.penguin-panel .pg-atlas i {font:italic 13px Georgia,serif}
+.penguin-panel .pg-atlas svg {width:100%; display:block; background:#f8f5e9; margin:6px 0}
+.penguin-panel .pg-atlas small {color:var(--muted);font-size:12px}
+.penguin-panel .pg-atlas p {font:550 13px/1.4 system-ui,sans-serif}
+.pg-atlas :is(.pg-gentoo,.pg-adelie,.pg-chinstrap) {display:none}
+.pg-atlas[data-species=Gentoo] .pg-gentoo,.pg-atlas[data-species=Adelie] .pg-adelie,.pg-atlas[data-species=Chinstrap] .pg-chinstrap {display:initial}
+.pg-atlas .pg-bill {fill:#4b4540}
+.pg-atlas[data-species=Gentoo] .pg-bill {fill:#d88843}
+.pg-atlas [data-measure] {cursor:pointer; color:#42605a}
+.pg-atlas .pg-target {fill:transparent;pointer-events:all}
+.pg-atlas .pg-rule,.pg-atlas .pg-guide,.pg-atlas .pg-hit {fill:none;stroke:currentColor}
+.pg-atlas .pg-rule {stroke-width:1.8}
+.pg-atlas .pg-guide {stroke-width:.9;stroke-dasharray:3 3}
+.pg-atlas .pg-hit {stroke:transparent;stroke-width:25}
+.pg-atlas text {font:600 12px system-ui,sans-serif;fill:currentColor}
+.pg-atlas .pg-chosen {color:#984114}
+.pg-atlas .pg-chosen .pg-rule {stroke-width:3.3}
+@media(prefers-reduced-motion:no-preference) {
+  .pg-atlas .pg-rule,.pg-atlas .pg-bill {transition:stroke .12s,stroke-width .12s,fill .12s}
+}
+.pg-atlas [data-measure]:focus-visible {outline:2px dashed var(--focus)}
+.penguin-panel .pg-chart-dialog,.penguin-panel .pg-inspector {color:var(--ink); background:#fff; color-scheme:light}
+.penguin-panel .pg-chart-dialog {border:1px solid var(--edge); border-radius:10px; width:min(1180px,95vw); max-width:95vw; max-height:92vh; padding:15px; overflow:auto}
+.penguin-panel .pg-chart-dialog::backdrop {background:rgb(13 37 35 / .66)}
+.penguin-panel .pg-plot-stage {position:relative; line-height:0}
+.penguin-panel .pg-halo {position:absolute; width:13px;height:13px;border:2px solid #763314;outline:2px solid white;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}
+.penguin-panel .pg-point-tag {position:absolute;pointer-events:none;max-width:45%;padding:4px 7px;border:1px solid #fff;border-radius:4px;background:#234a45;color:#fff;font:600 12px/1.35 system-ui,sans-serif;transform:translate(6px,calc(-100% - 6px));overflow-wrap:anywhere}
+.penguin-panel .pg-point-tag[data-side=left] {transform:translate(calc(-100% - 6px),calc(-100% - 6px))}
+.penguin-panel .pg-point-tag[data-below=true] {transform:translate(6px,6px)}
+.penguin-panel .pg-point-tag[data-below=true][data-side=left] {transform:translate(calc(-100% - 6px),6px)}
+.penguin-panel .pg-inspect-tools {display:flex;align-items:end;justify-content:space-between;flex-wrap:wrap;gap:4px 9px;padding-top:6px}
+.penguin-panel .pg-picker-field {display:flex;flex:1 1 190px;min-width:0;align-items:center;gap:8px}
+.penguin-panel .pg-picker-field label {color:var(--muted);font:600 12px/1.4 system-ui,sans-serif}
+.penguin-panel .pg-inspect-tools select {width:auto;min-width:0;flex:1 1 130px;height:32px}
+.penguin-panel .pg-dialog-head {display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding-bottom:10px}
+.penguin-panel .pg-dialog-head h3 {font:600 20px/1.2 var(--display)}
+.penguin-panel .pg-expand,.penguin-panel .pg-dialog-head button {font:600 13px/1.4 system-ui,sans-serif;min-height:32px;padding:5px 12px;border:1px solid var(--edge);border-radius:5px;background:#f5f5ed;color:var(--action);cursor:pointer}
+.penguin-panel .pg-tip {font:14px/1.45 system-ui,sans-serif; min-height:1.45em; margin:6px 0 0; color:#264f46; font-variant-numeric:tabular-nums}
+.penguin-panel .pg-inspector [hidden],.penguin-panel .pg-inspector[hidden] {display:none!important}
+.penguin-panel .pg-chart-dialog .pg-plot-stage {width:100%;margin:auto}
+.penguin-panel .pg-command .widget-button {white-space:normal; overflow:visible; line-height:1.2}
+@container(max-width:760px) {
+  .penguin-panel .pg-layout {grid-template-columns:1fr;grid-template-areas:"answer" "form" "chart"}
+  .penguin-panel .pg-form .pg-atlas {grid-column:1/-1}
+}
+@container(max-width:460px) {
+  .penguin-panel .pg-command {grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .penguin-panel .pg-command > :nth-child(2) {grid-column:1/-1}
+  .penguin-panel .pg-command .pg-reset {grid-column:1/-1}
+  .penguin-panel .pg-readout {grid-template-columns:1fr}
+  .penguin-panel .pg-picker-field {flex-wrap:wrap}
+  .penguin-panel .pg-context .pg-reading {margin:0}
+}
+@media(forced-colors:active) {
+  .pg-atlas .pg-rule,.pg-atlas .pg-chosen .pg-rule {stroke:CanvasText}
+  .pg-atlas .pg-chosen .pg-rule {stroke-dasharray:4 2}
+  .penguin-panel .pg-halo {border-color:Highlight;outline-color:Canvas}
+}
+.penguin-panel .pg-layout:not(.pg-analysis) {grid-template-areas:"form answer" "form atlas" "chart chart";grid-template-columns:minmax(320px,39%) minmax(0,1fr);grid-template-rows:auto 1fr auto}
+.penguin-panel .pg-layout > .pg-atlas {grid-area:atlas;align-self:stretch;margin:0;padding:12px 22px;background:#f8f5e9;border:0;border-bottom:1px solid var(--rule)}
+.penguin-panel .pg-layout > .pg-atlas figure {display:grid;grid-template-columns:minmax(0,1.6fr) minmax(115px,.8fr);align-content:center;align-items:center;column-gap:12px;height:100%}
+.penguin-panel .pg-atlas svg {grid-column:1;grid-row:1/4}
+.penguin-panel .pg-atlas figcaption,.penguin-panel .pg-atlas .pg-anatomy-note,.penguin-panel .pg-atlas small {grid-column:2}
+.penguin-panel .pg-atlas figcaption {align-self:end}
+.penguin-panel .pg-atlas figcaption strong,.penguin-panel .pg-atlas figcaption i {display:block;width:100%}
+.penguin-panel .pg-atlas small {align-self:start}
+.penguin-panel .pg-atlas .pg-anatomy-note {padding:6px 0}
+.penguin-panel .pg-layout:not(.pg-analysis) > .pg-view {border-top:1px solid var(--rule)}
+.penguin-panel .pg-chart {max-width:920px;margin-inline:auto}
+.penguin-panel .pg-help {padding-top:3px}
+@container(max-width:760px) {
+  .penguin-panel .pg-layout:not(.pg-analysis) {grid-template-columns:1fr;grid-template-areas:"answer" "form" "atlas" "chart"}
+}
+@container(max-width:460px) {
+  .penguin-panel .pg-layout > .pg-atlas {padding:12px var(--gutter)}
+  .penguin-panel .pg-layout > .pg-atlas figure {display:block}
+}
+.penguin-panel .pg-nav {display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:2px 10px}
+.penguin-panel .pg-fullscreen {font:600 13px/1.4 system-ui,sans-serif; min-height:32px; color:var(--action); background:transparent; border:0; padding:4px 0; cursor:pointer; text-decoration:underline; text-underline-offset:3px}
+.penguin-panel:fullscreen {max-width:100vw!important; width:100vw!important; height:100dvh!important; overflow:auto!important; display:block; border-radius:0}

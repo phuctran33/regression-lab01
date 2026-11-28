@@ -30,6 +30,31 @@ function render({ model, el }) {
   model.on("change:value", sync);
   sync();
   el.append(group);
-  return () => model.off("change:value", sync);
+  const abort = new AbortController();
+  if (model.get("fullscreen") && el.ownerDocument.fullscreenEnabled) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "pg-fullscreen";
+    button.textContent = "Toàn màn hình";
+    const doc = el.ownerDocument;
+    let active = false;
+    function syncFullscreen() {
+      const wasActive = active;
+      active = doc.fullscreenElement === el.closest(".penguin-panel");
+      button.textContent = active ? "Thoát toàn màn hình" : "Toàn màn hình";
+      if (wasActive && !active) button.focus();
+    }
+    button.addEventListener("click", async () => {
+      try {
+        if (active) await doc.exitFullscreen();
+        else await el.closest(".penguin-panel").requestFullscreen();
+      } catch {
+        button.title = "Trình duyệt chưa cho phép toàn màn hình trong cửa sổ này.";
+      }
+    }, {signal:abort.signal});
+    doc.addEventListener("fullscreenchange", syncFullscreen, {signal:abort.signal});
+    el.append(button);
+  }
+  return () => { abort.abort(); model.off("change:value", sync); };
 }
 export default { render };

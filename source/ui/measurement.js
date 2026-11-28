@@ -16,6 +16,7 @@ function render({ model, el }) {
   const id = "measure-" + crypto.getRandomValues(new Uint32Array(4)).join("-");
   el.classList.add("pg-measure");
   el.lang = "vi";
+  el.dataset.field = model.get("field");
   const format = new Intl.NumberFormat("vi-VN");
   label.htmlFor = id;
   label.textContent = title;

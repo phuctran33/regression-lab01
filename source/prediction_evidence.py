@@ -9,7 +9,7 @@ from matplotlib.figure import Figure
 
 from .analysis.uncertainty import LEVELS
 from .modeling import CATEGORICAL, FEATURES, TARGET
-from .prediction_figures import STYLES, finish, number, table
+from .prediction_figures import Mark, STYLES, finish, number, table
 
 ARTIFACT = Path(__file__).resolve().parents[1] / "report/comparison.json"
 
@@ -30,6 +30,7 @@ def demo_rows(train):
 
 def test_rows(test, prediction, radius=None):
     frame = pd.DataFrame({"actual": test[TARGET], "pred": prediction}, index=test.index)
+    frame["species"] = test.get("species", "")
     frame["residual"] = frame.actual - frame.pred
     if radius is not None:
         frame["low"], frame["high"] = frame.pred - radius, frame.pred + radius
@@ -73,13 +74,15 @@ def legend(ax, columns=2):
               frameon=False, fontsize=8.5, borderaxespad=0, handlelength=1.6)
 
 
-def interval_plot(rows, level):
+def interval_plot(rows, level, selected):
     fig, ax = canvas()
     for y, (name, row) in enumerate(rows.iterrows()):
         color, _, marker = STYLES.get(name, ("#35577b", "-", "o"))
         ax.hlines(y, row.low, row.high, color=color, lw=3)
         ax.plot([row.low, row.high], [y, y], "|", color=color, ms=11)
         ax.plot(row.pred, y, marker=marker, color=color, ms=8)
+        if name == selected:
+            ax.plot(row.pred, y, "o", mfc="none", mec="#163b39", ms=13)
     ax.set_yticks(range(len(rows)), rows.index)
     ax.invert_yaxis()
     ax.margins(y=.26)
@@ -90,21 +93,26 @@ def interval_plot(rows, level):
     note = " Ký hiệu là dự đoán điểm, hai đầu là cận. Khoảng hẹp có thể bỏ sót nhiều cá thể hơn. Chênh lệch độ rộng chưa đủ để xếp hạng mô hình. Chọn chế độ Benchmark để đối chiếu CV và bootstrap."
     data = [[n, number(r.pred), number(r.low), number(r.high), number(r.width),
              number(100*r.coverage)+"%", number(r.mae)] for n, r in rows.iterrows()]
-    return finish(fig, categorical_y=True), alt, alt + note + table(
+    marks = [Mark(r.pred, i, f"{n} · mục tiêu {level:.0%}", f"{number(r.pred)} g · Khoảng {number(r.low)}–{number(r.high)} g · Rộng {number(r.width)} g · Bao phủ {number(100*r.coverage)}% · MAE {number(r.mae)} g")
+             for i, (n, r) in enumerate(rows.iterrows())]
+    return finish(fig, marks, categorical_y=True, selected=rows.index.get_loc(selected)), alt, alt + note + table(
         ["Mô hình", "Điểm (g)", "Cận dưới (g)", "Cận trên (g)", "Rộng (g)", "Bao phủ test", "MAE (g)"], data)
 
 
 def coverage_plot(names, performance, selected):
     fig, ax = canvas()
     data = []
+    marks = []
     for level, style in zip(LEVELS, (":", "--")):
         ax.axhline(100*level, color="#657585", lw=1, ls=style)
     for name in names:
         color, line, marker = STYLES.get(name, ("#35577b", "-", "o"))
         summaries = [performance[name, level] for level in LEVELS]
         ax.plot([s["width_g"] for s in summaries], [100*s["coverage"] for s in summaries],
-                color=color, ls=line, marker=marker, ms=5, label=name)
+                color=color, ls=line, marker=marker, ms=7 if name == selected else 5, lw=2 if name == selected else 1, label=name)
         for level, s in zip(LEVELS, summaries):
+            marks.append(Mark(s["width_g"], 100*s["coverage"], f"{name} · mục tiêu {level:.0%}",
+                              f"Bao phủ {number(100*s['coverage'])}% · Rộng {number(s['width_g'])} g · Ngoài {s['outside']}/{s['n']}"))
             data.append([name, f"{level:.0%}", number(100*s["coverage"])+"%", number(s["width_g"]),
                          s["outside"], s["n"]])
     ax.set(xlabel="Độ rộng khoảng (g)", ylabel="Bao phủ thực nghiệm (%)")
@@ -114,7 +122,7 @@ def coverage_plot(names, performance, selected):
            f"Số cá thể ngoài khoảng lần lượt là {low['outside']} và {high['outside']} trên {high['n']} mẫu.")
     note = (" Mỗi đường nối hai mức của một mô hình, từ khoảng hẹp đến khoảng rộng. "
             "Hai đường ngang đánh dấu mục tiêu 90% và 95%. Bao phủ thực nghiệm là tỷ lệ của tập test.")
-    return finish(fig), alt, alt + note + table(["Mô hình", "Mục tiêu", "Bao phủ test", "Rộng (g)", "Ngoài", "n"], data)
+    return finish(fig, marks, selected=list(names).index(selected)*len(LEVELS)), alt, alt + note + table(["Mô hình", "Mục tiêu", "Bao phủ test", "Rộng (g)", "Ngoài", "n"], data)
 
 
 def heldout_plot(rows, name, level):
@@ -133,7 +141,9 @@ def heldout_plot(rows, name, level):
     data = [[i, number(r.actual), number(r.pred), number(r.low), number(r.high),
              "Trong" if r.inside else "Ngoài"] for i, r in rows.iterrows()]
     note = " Dấu × đánh dấu cá thể ngoài khoảng. Thứ tự trên trục ngang và trong bảng xếp theo dự đoán, từ nhẹ đến nặng."
-    return finish(fig), alt, alt + note + table(["ID", "Thực (g)", "Dự đoán (g)", "Dưới (g)", "Trên (g)", "Vị trí"], data)
+    marks = [Mark(j, r.actual, f"{name} · ID {idx} · {r.species}", f"Thực {number(r.actual)} g · Dự đoán {number(r.pred)} g · Phần dư {number(r.residual)} g · |Sai số| {number(abs(r.residual))} g · Khoảng {level:.0%} {number(r.low)}–{number(r.high)} g · Rộng {number(r.high-r.low)} g · {'Trong' if r.inside else 'Ngoài'} khoảng")
+             for j, (idx, r) in enumerate(rows.iterrows(), 1)]
+    return finish(fig, marks), alt, alt + note + table(["ID", "Thực (g)", "Dự đoán (g)", "Dưới (g)", "Trên (g)", "Vị trí"], data)
 
 
 def actual_plot(rows, name, metrics, protocol):
@@ -151,7 +161,10 @@ def actual_plot(rows, name, metrics, protocol):
            f"RMSE {number(metrics['RMSE (g)'])} g, R² {number(metrics['R²'], 3)}. "
            f"Sai lệch lớn nhất {number(abs(rows.at[worst, 'residual']))} g ở ID {worst}.")
     data = [[i, number(r.actual), number(r.pred), number(r.residual)] for i, r in rows.iterrows()]
-    return finish(fig), alt, alt + " Điểm dưới đường chéo là dự đoán thấp. MAE tóm tắt trung bình trên cả tập." + table(
+    marks = [Mark(r.actual, r.pred, f"{name} · ID {idx} · {r.species}",
+                  f"Thực {number(r.actual)} g · Dự đoán {number(r.pred)} g · Phần dư {number(r.residual)} g · |Sai số| {number(abs(r.residual))} g")
+             for idx, r in rows.iterrows()]
+    return finish(fig, marks), alt, alt + " Điểm dưới đường chéo là dự đoán thấp. MAE tóm tắt trung bình trên cả tập." + table(
         ["ID", "Thực (g)", "Dự đoán (g)", "Phần dư (g)"], data)
 
 
@@ -179,7 +192,9 @@ def benchmark_plot(data, names, n):
     alt = f"Benchmark trên {n} cá thể. {containing}/{len(contrasts)} khoảng bootstrap ghép cặp 95% của ΔMAE chứa 0."
     details = table(headers, rows).replace("Xem số liệu của biểu đồ", "Chỉ số test và MAE trung bình các fold")
     paired = [[name, *[number(c[k], 2) for k in ("delta_g", "ci_low_g", "ci_high_g")]] for name, c in contrasts]
-    return finish(fig, categorical_y=True), alt, (alt + " Δ âm là giảm MAE. Đọc cả độ lớn theo gram và độ bất định. Chọn chế độ conformal để so khoảng cho cùng một cá thể. "
+    marks = [Mark(c["delta_g"], i, f"{n} so với OLS", f"ΔMAE {number(c['delta_g'],2)} g · CI 95% [{number(c['ci_low_g'],2)}; {number(c['ci_high_g'],2)}] g")
+             for i, (n, c) in enumerate(contrasts)]
+    return finish(fig, marks, categorical_y=True), alt, (alt + " Δ âm là giảm MAE. Đọc cả độ lớn theo gram và độ bất định. Chọn chế độ conformal để so khoảng cho cùng một cá thể. "
         "CV cố định giữ cấu hình đã chọn. Nested CV chọn lại trong từng fold train." + details +
         table(["So với OLS", "ΔMAE (g)", "CI dưới (g)", "CI trên (g)"], paired))
 
@@ -207,6 +222,8 @@ def method_plot(scores, name, level, n_train, n_test):
         (f"Đối chiếu {n_test} mẫu test", "Đếm số khối lượng thực tế nằm giữa hai cận, kể cả bằng cận."),
     ]
     flow = '<ol class="pg-method">' + ''.join(f"<li><strong>{title}</strong> {text}</li>" for title,text in steps) + "</ol>"
-    return finish(fig), alt, (alt + flow + "Bao phủ biên áp dụng trên các cá thể có thể trao đổi được với mẫu hiệu chỉnh. "
+    marks = [Mark(i, v, f"{name} · hạng {i}/{n}", f"Sai số hiệu chỉnh {number(v)} g" + (" · Bán kính đã chọn" if i == k else ""))
+             for i, v in enumerate(scores, 1)]
+    return finish(fig, marks, selected=min(k,n)-1), alt, (alt + flow + "Bao phủ biên áp dụng trên các cá thể có thể trao đổi được với mẫu hiệu chỉnh. "
         "Tỷ lệ có thể khác theo loài. Dữ liệu ít khiến tỷ lệ quan sát dao động. Tập test đã được nhóm đánh giá trước đây. "
         "Đổi predictor cần hiệu chỉnh lại khoảng." + table(["Hạng", "|Phần dư| (g)"], [(i, number(v)) for i,v in enumerate(scores,1)]))

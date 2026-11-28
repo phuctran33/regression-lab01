@@ -1,4 +1,9 @@
 """Numerical and state regressions for the notebook evidence panels."""
+import csv
+from html import unescape
+from io import StringIO
+import re
+from urllib.parse import unquote
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -22,6 +27,57 @@ class PredictionEvidenceTests(TestCase):
 
     def setUp(self):
         self.app._reset()
+
+    def test_csv_uses_the_current_fit_and_only_its_intervals(self):
+        app = self.app
+        for mode in ("conformal", "full"):
+            app.protocol.value = mode
+            for name in MODULES:
+                app.model_picker.value = name
+                app.predict_button.click()
+                uri = re.search(r'href="data:text/csv;charset=utf-8,([^"]+)"', app.result.value)
+                self.assertIsNotNone(uri)
+                rows = list(csv.DictReader(StringIO(unquote(unescape(uri[1])).lstrip("\ufeff"))))
+                self.assertEqual(len(rows), 1)
+                row = rows[0]
+                self.assertEqual((row["model"], row["protocol"]), (name, mode))
+                for key in FEATURES:
+                    self.assertEqual(str(app.defaults[key]), row[key])
+                predictor = app.models[name] if mode == "full" else app.calibrated[name].predictor
+                point = predictor.predict(pd.DataFrame([app.defaults]))[0]
+                self.assertAlmostEqual(float(row["prediction_g"]), point)
+                if mode == "conformal":
+                    _, low, high = app.calibrated[name].interval(pd.DataFrame([app.defaults]), app.level.value)
+                    np.testing.assert_allclose([float(row["lower_g"]), float(row["upper_g"])], [low[0], high[0]])
+                    self.assertAlmostEqual(float(row["empirical_coverage"]), app.performance[name, app.level.value]["coverage"])
+                elif name == "OLS":
+                    self.assertLess(float(row["lower_g"]), float(row["mean_ci_lower_g"]))
+                    self.assertGreater(float(row["upper_g"]), float(row["mean_ci_upper_g"]))
+                else:
+                    self.assertEqual([row[k] for k in ("lower_g", "mean_ci_lower_g", "empirical_coverage")], [""]*3)
+        app.controls["flipper_length_mm"].value += 1
+        self.assertNotIn("data:text/csv", app.result.value)
+
+    def test_inspector_tracks_test_ids_and_calibration_rank_in_both_layouts(self):
+        app = self.app
+        app.model_picker.value = "M2"
+        app.level.value = .9
+        app.predict_button.click()
+        app.section.value = "verify"
+        inspection = app.chart.inspection
+        expected = ev.test_rows(self.test, app.predictions["conformal", "M2"], app.calibrated["M2"].radii[.9])
+        for (idx, row), (title, detail) in zip(expected.iterrows(), inspection["labels"], strict=True):
+            self.assertEqual(title, f"M2 · ID {idx} · {row.species}")
+            self.assertIn(number(row.actual), detail)
+            self.assertIn(number(row.low), detail)
+            self.assertIn("Trong khoảng" if row.inside else "Ngoài khoảng", detail)
+        for layout in ("wide", "compact"):
+            positions = np.asarray(inspection[layout])
+            self.assertEqual(positions.shape, (69, 2))
+            self.assertTrue(((0 <= positions) & (positions <= 1)).all())
+        app.section.value = "method"
+        self.assertEqual(app.chart.inspection["selected"], 50)
+        self.assertIn("hạng 51/55", app.chart.inspection["labels"][50][0])
 
     def test_intervals_and_coverage_width_match_the_calibrated_predictors(self):
         app = self.app
