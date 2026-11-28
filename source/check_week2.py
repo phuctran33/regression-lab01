@@ -75,6 +75,7 @@ if checked_app is not None and hasattr(checked_app, "predict_button"):
     # Check the benchmark using its full-train predictor, then the separate calibrated fit.
     if hasattr(checked_app, "protocol"):
         checked_app.protocol.value = "full"
+    from source.prediction_figures import number
     for name in models:
         checked_app.model_picker.value = name
         checked_app.predict_button.click()
@@ -82,14 +83,14 @@ if checked_app is not None and hasattr(checked_app, "predict_button"):
         assert bytes(checked_app.chart.value).startswith(b"\\x89PNG")
         inputs = {feature: control.value for feature, control in checked_app.controls.items()}
         expected = models[name].predict(pd.DataFrame([inputs]))[0]
-        assert f"{expected:,.1f}" in checked_app.result.value
+        assert number(expected) in checked_app.result.value
     if getattr(checked_app, "calibrated", {}):
         checked_app.protocol.value = "conformal"
         for name, fitted in checked_app.calibrated.items():
             checked_app.model_picker.value = name
             checked_app.predict_button.click()
             point, low, high = fitted.interval(pd.DataFrame([inputs]), checked_app.level.value)
-            assert all(f"{value[0]:,.1f}" in checked_app.result.value for value in (point, low, high))
+            assert all(number(value[0]) in checked_app.result.value for value in (point, low, high))
 elif "render_prediction" in globals():
     import builtins
     from io import BytesIO

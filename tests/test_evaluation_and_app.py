@@ -15,6 +15,7 @@ matplotlib.use("Agg")
 from source.evaluation import analyze, fit_ols_inference, heldout_tables, ols_prediction_intervals, paired_bootstrap
 from source.modeling import FEATURES, TARGET, load_penguins, split_penguins
 from source.models import m1, m2, m3, ols
+from source.prediction_figures import number
 from source.prediction_app import PredictionApp
 
 
@@ -146,12 +147,12 @@ class PredictionAppTests(TestCase):
             values = {feature: widget.value for feature, widget in app.controls.items()}
             expected = self.models["M3"].predict(pd.DataFrame([values]))[0]
             self.assertIn("M3 · khối lượng dự đoán", app.result.value)
-            self.assertIn(f"{expected:,.1f} g", app.result.value)
+            self.assertIn(f"{number(expected)} g", app.result.value)
             self.assertNotIn("PI 95%", app.result.value)
             self.assertTrue(bytes(app.chart.value).startswith(b"\x89PNG"))
             self.assertNotEqual(first_image, bytes(app.chart.value))
             app.predict_button.click()
-            self.assertIn(f"{expected:,.1f} g", app.result.value)
+            self.assertIn(f"{number(expected)} g", app.result.value)
             self.assertFalse(app.predict_button.disabled)
 
             app.controls["species"].value = "Gentoo"

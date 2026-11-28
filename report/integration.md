@@ -89,7 +89,7 @@ Người dùng chọn một trong bốn mô hình, nhập ba số đo và hai th
 
 ![Giao diện dự đoán và khoảng cá thể thực tế trong JupyterLab.](figures/prediction-dashboard.png)
 
-Slider chỉ cho nhập trong miền gộp. Nếu một số đo ngoài miền train của loài, giao diện ghi tên số đo cần thận trọng. Tổ hợp đầu vào vẫn có thể hiếm ngay cả khi từng số đo nằm trong miền. Xem [kịch bản demo và cách đọc kết quả](section-3-4-application.md).
+Thanh trượt và ô nhập số dùng giới hạn của train. Histogram thể hiện phần dư có dấu (thực tế trừ dự đoán). Boxplot so sánh độ lớn sai số theo loài. Hai hình và các bảng đi kèm dùng cùng 69 cá thể test và đúng predictor của chế độ đang chọn. Nếu một số đo ngoài miền train của loài, giao diện ghi tên số đo cần thận trọng. Tổ hợp đầu vào vẫn có thể hiếm ngay cả khi từng số đo nằm trong miền. Xem [kịch bản demo và cách đọc kết quả](section-3-4-application.md).
 
 ## Kết luận trong phạm vi ba thành viên
 

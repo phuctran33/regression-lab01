@@ -10,6 +10,7 @@ from source.analysis.uncertainty import (
 )
 from source.modeling import FEATURES, TARGET, load_penguins, split_penguins
 from source.models import ols
+from source.prediction_figures import number
 from source.prediction_app import PredictionApp
 
 
@@ -65,11 +66,48 @@ class ConformalTests(unittest.TestCase):
                 app.level.value = level
                 app.predict_button.click()
                 for values in app.calibrated["OLS"].interval(inputs, level):
-                    self.assertIn(f"{values[0]:,.1f}", app.result.value)
+                    self.assertIn(number(values[0]), app.result.value)
                 self.assertIn("69 mẫu test", app.result.value)
                 self.assertTrue(bytes(app.chart.value).startswith(b"\x89PNG"))
             app.protocol.value = "full"
             app.predict_button.click()
-            self.assertIn(f"{models['OLS'].predict(inputs)[0]:,.1f}", app.result.value)
+            self.assertIn(number(models["OLS"].predict(inputs)[0]), app.result.value)
             self.assertIn("CI 95%", app.result.value)
             self.assertTrue(app.level.disabled)
+
+    def test_error_views_use_heldout_rows_and_the_selected_protocol(self):
+        train, test = split_penguins(load_penguins())
+        full = ols.build_model().fit(train[FEATURES], train[TARGET])
+        app = PredictionApp({"OLS": full}, train, {TARGET: "Khối lượng (g)"}, test=test)
+        self.assertEqual(number(3571.74), "3.571,7")
+        for protocol, fit in (("conformal", app.calibrated["OLS"].predictor), ("full", full)):
+            app.protocol.value = protocol
+            expected = test[TARGET] - fit.predict(test[FEATURES])
+            pd.testing.assert_series_equal(app.residuals[protocol, "OLS"], expected)
+            app.predict_button.click()
+            app.view.value = "hist"
+            self.assertIn(f"Trung vị {number(expected.median())}", app.chart.description)
+            app.view.value = "box"
+            for species, errors in expected.abs().groupby(test.species):
+                cells = [species, str(len(errors)), *[number(q) for q in errors.quantile([.25, .5, .75])]]
+                self.assertIn("".join(f"<td>{value}</td>" for value in cells), app.caption.value)
+            self.assertTrue(bytes(app.chart.value).startswith(b"\x89PNG"))
+
+    def test_edit_during_figure_render_discards_previous_result(self):
+        train, _ = split_penguins(load_penguins())
+        model = ols.build_model().fit(train[FEATURES], train[TARGET])
+        app = PredictionApp({"OLS": model}, train, {})
+        field = app.controls["flipper_length_mm"]
+
+        def edit_while_drawing(*args):
+            field.value = field.value + 1
+            return b"old image", "old description", "old caption"
+
+        with patch("source.prediction_app.trend_plot", side_effect=edit_while_drawing):
+            app.predict_button.click()
+        self.assertFalse(app.rendered)
+        self.assertEqual(app.chart.value, b"")
+        self.assertIn("Bấm Dự đoán", app.result.value)
+        self.assertFalse(app.predict_button.disabled)
+        app.predict_button.click()
+        self.assertTrue(app.rendered)
